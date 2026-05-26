@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 import { bootLines, impactStats, profile, projects, stackLayers, statusCards, timeline } from './data/portfolio'
@@ -153,6 +153,17 @@ function ArchitectureFlow({ steps }) {
 function SystemsSection() {
   const [filter, setFilter] = useState('featured')
   const [selectedProject, setSelectedProject] = useState(projects[0])
+  const detailRef = useRef(null)
+
+  const selectProject = (project) => {
+    setSelectedProject(project)
+
+    if (window.matchMedia('(max-width: 1040px)').matches) {
+      window.requestAnimationFrame(() => {
+        detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
+    }
+  }
 
   const filteredProjects = useMemo(() => {
     if (filter === 'featured') return projects.filter((project) => project.featured)
@@ -190,12 +201,12 @@ function SystemsSection() {
               key={project.id}
               project={project}
               selected={selectedProject.id === project.id}
-              onSelect={setSelectedProject}
+              onSelect={selectProject}
             />
           ))}
         </div>
 
-        <aside className="project-detail-card" data-reveal>
+        <aside className="project-detail-card" ref={detailRef} data-reveal>
           <div className="detail-header">
             <span>ACTIVE_SYSTEM</span>
             <strong>{selectedProject.role}</strong>
