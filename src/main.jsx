@@ -21,6 +21,33 @@ function useBootText(lines) {
   return visibleLines
 }
 
+function useScrollReveal() {
+  useEffect(() => {
+    const revealTargets = document.querySelectorAll('[data-reveal]')
+
+    if (!('IntersectionObserver' in window)) {
+      revealTargets.forEach((target) => target.classList.add('is-visible'))
+      return undefined
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.16, rootMargin: '0px 0px -72px 0px' }
+    )
+
+    revealTargets.forEach((target) => observer.observe(target))
+
+    return () => observer.disconnect()
+  }, [])
+}
+
 function Navbar() {
   return (
     <header className="nav-shell">
@@ -43,7 +70,7 @@ function TerminalHero() {
 
   return (
     <section id="boot" className="hero section-shell">
-      <div className="hero-copy">
+      <div className="hero-copy" data-reveal>
         <div className="eyebrow">Engineering Control Room</div>
         <h1>
           {profile.name}
@@ -57,7 +84,7 @@ function TerminalHero() {
         </div>
       </div>
 
-      <div className="terminal-card" aria-label="AtalOS boot terminal">
+      <div className="terminal-card" aria-label="AtalOS boot terminal" data-reveal>
         <div className="terminal-topbar">
           <span /> <span /> <span />
           <strong>atal@control-room:~</strong>
@@ -76,8 +103,8 @@ function TerminalHero() {
 function StatusDashboard() {
   return (
     <section className="status-grid section-shell" aria-label="System status dashboard">
-      {statusCards.map((card) => (
-        <article className="status-card" key={card.label}>
+      {statusCards.map((card, index) => (
+        <article className="status-card" key={card.label} data-reveal style={{ '--reveal-delay': `${index * 70}ms` }}>
           <div className="status-line">
             <span>{card.label}</span>
             <strong>{card.value}</strong>
@@ -91,7 +118,11 @@ function StatusDashboard() {
 
 function ProjectCard({ project, selected, onSelect }) {
   return (
-    <button className={`project-card ${selected ? 'selected' : ''}`} onClick={() => onSelect(project)}>
+    <button
+      className={`project-card ${selected ? 'selected' : ''}`}
+      onClick={() => onSelect(project)}
+      aria-pressed={selected}
+    >
       <div className="project-meta">
         <span>{project.type}</span>
         <span>{project.status}</span>
@@ -138,13 +169,13 @@ function SystemsSection() {
 
   return (
     <section id="systems" className="section-shell systems-section">
-      <div className="section-heading">
+      <div className="section-heading" data-reveal>
         <div className="eyebrow">/systems</div>
         <h2>Deployed systems, not just projects.</h2>
         <p>Each case study is organized around problem, architecture, ownership, tech choices, and measurable impact.</p>
       </div>
 
-      <div className="command-bar" role="group" aria-label="Project filters">
+      <div className="command-bar" role="group" aria-label="Project filters" data-reveal>
         {['featured', 'all', 'ai', 'cloud'].map((option) => (
           <button key={option} className={filter === option ? 'active' : ''} onClick={() => setFilter(option)}>
             projects --{option}
@@ -164,7 +195,7 @@ function SystemsSection() {
           ))}
         </div>
 
-        <aside className="project-detail-card">
+        <aside className="project-detail-card" data-reveal>
           <div className="detail-header">
             <span>ACTIVE_SYSTEM</span>
             <strong>{selectedProject.role}</strong>
@@ -196,14 +227,14 @@ function ArchitectureSection() {
 
   return (
     <section id="architecture" className="section-shell architecture-section">
-      <div className="section-heading compact">
+      <div className="section-heading compact" data-reveal>
         <div className="eyebrow">/architecture</div>
         <h2>Architecture lab</h2>
         <p>Three systems shown as recruiter-friendly backend flows.</p>
       </div>
       <div className="architecture-grid">
-        {featured.map((project) => (
-          <article className="architecture-card" key={project.id}>
+        {featured.map((project, index) => (
+          <article className="architecture-card" key={project.id} data-reveal style={{ '--reveal-delay': `${index * 90}ms` }}>
             <div className="project-meta">
               <span>{project.title}</span>
               <span>{project.type}</span>
@@ -220,13 +251,13 @@ function ArchitectureSection() {
 function StackSection() {
   return (
     <section id="stack" className="section-shell stack-section">
-      <div className="section-heading compact">
+      <div className="section-heading compact" data-reveal>
         <div className="eyebrow">/stack</div>
         <h2>Technology stack as system layers</h2>
       </div>
       <div className="stack-layers">
         {stackLayers.map((layer, index) => (
-          <article className="stack-layer" key={layer.title} style={{ '--layer-index': index }}>
+          <article className="stack-layer" key={layer.title} data-reveal style={{ '--layer-index': index, '--reveal-delay': `${index * 60}ms` }}>
             <h3>{layer.title}</h3>
             <div className="tool-list">
               {layer.tools.map((tool) => <span key={tool}>{tool}</span>)}
@@ -241,14 +272,14 @@ function StackSection() {
 function ImpactSection() {
   return (
     <section id="impact" className="section-shell impact-section">
-      <div className="section-heading compact">
+      <div className="section-heading compact" data-reveal>
         <div className="eyebrow">/impact</div>
         <h2>Impact wall</h2>
         <p>Numbers that convert resume claims into a quick visual proof-of-work.</p>
       </div>
       <div className="impact-grid">
-        {impactStats.map((stat) => (
-          <article className="impact-card" key={`${stat.number}-${stat.label}`}>
+        {impactStats.map((stat, index) => (
+          <article className="impact-card" key={`${stat.number}-${stat.label}`} data-reveal style={{ '--reveal-delay': `${index * 70}ms` }}>
             <strong>{stat.number}</strong>
             <span>{stat.label}</span>
             <small>{stat.source}</small>
@@ -262,13 +293,13 @@ function ImpactSection() {
 function TimelineSection() {
   return (
     <section className="section-shell timeline-section">
-      <div className="section-heading compact">
+      <div className="section-heading compact" data-reveal>
         <div className="eyebrow">/career-log</div>
         <h2>Career mission log</h2>
       </div>
       <div className="timeline">
-        {timeline.map((item) => (
-          <article className="timeline-item" key={`${item.company}-${item.period}`}>
+        {timeline.map((item, index) => (
+          <article className="timeline-item" key={`${item.company}-${item.period}`} data-reveal style={{ '--reveal-delay': `${index * 70}ms` }}>
             <div>
               <span>{item.period}</span>
               <h3>{item.role}</h3>
@@ -285,7 +316,7 @@ function TimelineSection() {
 function ContactSection() {
   return (
     <section id="contact" className="section-shell contact-section">
-      <div className="contact-card">
+      <div className="contact-card" data-reveal>
         <div>
           <div className="eyebrow">/contact</div>
           <h2>Want to build something production-ready?</h2>
@@ -303,6 +334,8 @@ function ContactSection() {
 }
 
 function App() {
+  useScrollReveal()
+
   return (
     <main>
       <div className="background-grid" />
