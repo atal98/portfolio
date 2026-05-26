@@ -240,8 +240,7 @@ function ArchitectureSection() {
     <section id="architecture" className="section-shell architecture-section">
       <div className="section-heading compact" data-reveal>
         <div className="eyebrow">/architecture</div>
-        <h2>Architecture lab</h2>
-        <p>Three systems shown as recruiter-friendly backend flows.</p>
+        <h2>System Architecture</h2>
       </div>
       <div className="architecture-grid">
         {featured.map((project, index) => (
@@ -285,8 +284,7 @@ function ImpactSection() {
     <section id="impact" className="section-shell impact-section">
       <div className="section-heading compact" data-reveal>
         <div className="eyebrow">/impact</div>
-        <h2>Impact wall</h2>
-        <p>Numbers that convert resume claims into a quick visual proof-of-work.</p>
+        <h2>Impact</h2>
       </div>
       <div className="impact-grid">
         {impactStats.map((stat, index) => (
