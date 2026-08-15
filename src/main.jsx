@@ -1,12 +1,23 @@
 import { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Badge, Tabs, TextField, Theme } from '@radix-ui/themes'
+import L from 'leaflet'
+import { CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip } from 'react-leaflet'
 import '@radix-ui/themes/styles.css'
+import 'leaflet/dist/leaflet.css'
 import './styles.css'
 import { profile, projects } from './data/portfolio'
 
 const resumeUrl = `${import.meta.env.BASE_URL}atal-upadhyay-resume.pdf`
 const initialProject = projects[0]
+const iocRoute = [[25.0657, 55.1713], [23.7, 60.2], [21.6, 65.8], [19.35, 70.3], [18.9388, 72.8354]]
+const iocRouteBounds = [[18.2, 54.2], [25.8, 73.8]]
+const navigationIcon = (routeState) => L.divIcon({
+  className: `leaflet-navigation-icon is-${routeState}`,
+  html: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle class="navigation-disc" cx="20" cy="20" r="15"/><path class="navigation-arrow" d="m20 8 8 21-8-4-8 4 8-21Z"/></svg>',
+  iconSize: [32, 32],
+  iconAnchor: [16, 16]
+})
 
 const storyMeta = {
   'bpcl-ev': {
@@ -65,6 +76,74 @@ function ArrowIcon() {
 
 function BoltIcon() {
   return <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m11.5 2-6 9h4l-1 7 6-9h-4l1-7Z" /></svg>
+}
+
+function interpolateRoute(progress) {
+  const scaled = progress * (iocRoute.length - 1)
+  const index = Math.min(Math.floor(scaled), iocRoute.length - 2)
+  const remainder = scaled - index
+  const [fromLat, fromLng] = iocRoute[index]
+  const [toLat, toLng] = iocRoute[index + 1]
+  return [fromLat + (toLat - fromLat) * remainder, fromLng + (toLng - fromLng) * remainder]
+}
+
+function splitIocRoute(progress) {
+  const scaled = progress * (iocRoute.length - 1)
+  const index = Math.min(Math.floor(scaled), iocRoute.length - 2)
+  const position = interpolateRoute(progress)
+
+  return {
+    position,
+    completed: [...iocRoute.slice(0, index + 1), position],
+    remaining: [position, ...iocRoute.slice(index + 1)]
+  }
+}
+
+function RouteNavigationMarker({ position, routeState }) {
+  return <Marker position={position} icon={navigationIcon(routeState)} keyboard={false} aria-label="Point B: MV Horizon current position">
+    <Tooltip permanent direction="right" offset={[18, 0]}>B · MV Horizon</Tooltip>
+  </Marker>
+}
+
+function IocRouteMap() {
+  const [routeState, setRouteState] = useState('moving')
+  const [progress, setProgress] = useState(.42)
+  const reducedMotion = useReducedMotion()
+  const route = splitIocRoute(progress)
+  const isHolding = routeState === 'holding'
+
+  useEffect(() => {
+    if (reducedMotion || isHolding) return undefined
+    const timer = window.setInterval(() => setProgress((current) => current >= .7 ? .42 : current + .003), 90)
+    return () => window.clearInterval(timer)
+  }, [isHolding, reducedMotion])
+
+  const forwardColor = isHolding ? 'var(--route-hold)' : 'var(--route-forward)'
+  const status = isHolding ? 'On hold at point B' : 'Heading to point C'
+  const detail = isHolding ? 'Cargo clearance · next update 14:20 UTC' : 'Mumbai · ETA 14:20 UTC'
+
+  return <>
+    <div className="shipping-route" role="region" aria-label={`Route tracker from point A, Jebel Ali, through point B, MV Horizon, to point C, Mumbai. Status: ${status}.`}>
+      <MapContainer className="ioc-map" bounds={iocRouteBounds} zoomControl={false} scrollWheelZoom={false} doubleClickZoom={false} dragging={false} keyboard={false} attributionControl={false}>
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <Polyline positions={route.completed} pathOptions={{ color: 'var(--accent)', weight: 3 }} />
+        <Polyline positions={route.remaining} pathOptions={{ color: forwardColor, weight: 3, dashArray: isHolding ? '2 7' : '7 6' }} />
+        <CircleMarker center={iocRoute[0]} radius={5} pathOptions={{ color: 'var(--accent)', fillColor: 'var(--surface)', fillOpacity: 1, weight: 2 }}><Tooltip permanent direction="bottom" offset={[0, 10]}>A · Jebel Ali</Tooltip></CircleMarker>
+        <CircleMarker center={iocRoute[iocRoute.length - 1]} radius={5} pathOptions={{ color: forwardColor, fillColor: 'var(--surface)', fillOpacity: 1, weight: 2 }}><Tooltip permanent direction="top" offset={[0, -8]}>C · Mumbai</Tooltip></CircleMarker>
+        <RouteNavigationMarker position={route.position} routeState={routeState} />
+      </MapContainer>
+      <div className="route-live-status" aria-live="polite"><strong>{status}</strong><span>{detail}</span></div>
+      <div className="route-state-switch" role="group" aria-label="Route state">
+        <button type="button" className={!isHolding ? 'is-active' : ''} aria-pressed={!isHolding} onClick={() => setRouteState('moving')}>In transit</button>
+        <button type="button" className={isHolding ? 'is-active is-holding' : ''} aria-pressed={isHolding} onClick={() => setRouteState('holding')}>Hold</button>
+      </div>
+    </div>
+    <div className="route-key" aria-label="Route tracker key">
+      <span><i className="route-key-completed" />A → B · covered</span>
+      <span><i className={isHolding ? 'route-key-holding' : 'route-key-forward'} />B → C · {isHolding ? 'on hold' : 'heading'}</span>
+      <span>Point B is the live tracker.</span>
+    </div>
+  </>
 }
 
 function SystemStory({ project, compact = false }) {
@@ -179,7 +258,8 @@ function RvinScene({ project }) {
 
 function IocScene({ project }) {
   return <SceneFrame project={project}>
-    <div className="scene-appbar"><strong>Vessel operations</strong><Badge color="blue" variant="soft">Synced 2 min ago</Badge></div>
+    <div className="scene-appbar"><strong>Vessel operations</strong><Badge color="blue" variant="soft">Route tracker</Badge></div>
+    <IocRouteMap />
     <div className="vessel-table" role="table" aria-label="Illustrative vessel operations table">
       <div role="row" className="vessel-heading"><span role="columnheader">Vessel</span><span role="columnheader">ETA</span><span role="columnheader">Status</span></div>
       <div role="row"><strong role="cell">MV Horizon</strong><span role="cell">14:20</span><Badge role="cell" color="blue" variant="soft">On route</Badge></div>

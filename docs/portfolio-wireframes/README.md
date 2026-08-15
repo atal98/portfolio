@@ -34,6 +34,9 @@ site code is changed while the direction is being decided.
 - `12-interface-scenes-implementation.md` - the delivered Radix-informed
   visual scene implementation and final QA result.
 
+- `13-ioc-live-route-implementation.md` - the IOC vessel route and motion
+  implementation decision record.
+
 ## Decision status
 
 **Implemented.** The approved system-story direction now exists in the live

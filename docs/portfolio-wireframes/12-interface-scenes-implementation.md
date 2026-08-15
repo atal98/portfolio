@@ -16,7 +16,7 @@ technical proof layer.
 | Spotwork Multi-Tenant SaaS Job Board | Tenant workspace, role state, and isolated tenant resolver boundary |
 | AI-Powered Audiobook Mobile Platform | Playback, subtitle, and AI listening state |
 | RVIN Merchant Support AI | Multi-channel support inbox, policy knowledge, and approval-ready response |
-| IOC Shipping & Logistics Platform | Vessel operations table, sync status, and ETL review state |
+| IOC Shipping & Logistics Platform | Live Jebel Ali-to-Mumbai route, vessel status, and ETL review state |
 
 ## Radix Themes usage
 

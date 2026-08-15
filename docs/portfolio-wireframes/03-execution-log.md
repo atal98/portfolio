@@ -44,6 +44,15 @@ the final verification record.
   for three of them.
 - Did not change the live React portfolio during this research/wireframe pass.
 
+## 2026-08-16 - IOC live route implemented and reviewed
+
+- Added a lightweight, accessible inline SVG route to the IOC illustrative
+  scene, with a vessel moving from Jebel Ali to Mumbai.
+- Confirmed Radix Themes has no mapping component and deliberately avoided a
+  separate mapping dependency for a single visual scene.
+- Completed production-preview QA for route motion, accessibility label,
+  selection state, overflow, target size, and console output.
+
 ## 2026-08-16 - Radix interface scenes implemented and reviewed
 
 - Replaced the hero's generic map with six project-specific illustrative
