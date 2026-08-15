@@ -1,175 +1,439 @@
 import { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Badge, Tabs, TextField, Theme } from '@radix-ui/themes'
+import '@radix-ui/themes/styles.css'
 import './styles.css'
-import { impactStats, profile, projects, stackLayers, timeline } from './data/portfolio'
+import { profile, projects } from './data/portfolio'
 
 const resumeUrl = `${import.meta.env.BASE_URL}atal-upadhyay-resume.pdf`
-const featuredProjects = projects.filter((project) => project.featured).slice(0, 3)
+const initialProject = projects[0]
+
+const storyMeta = {
+  'bpcl-ev': {
+    mode: 'event-route',
+    label: 'Event route',
+    decision: 'Async orchestration',
+    detail: 'Temporal workflows keep protocol events, retries, and charging-session state in order.',
+    decisionIndex: 3,
+    outcome: 'A faster, more dependable charging-session start.'
+  },
+  planzookie: {
+    mode: 'context-pipeline',
+    label: 'Grounded context pipeline',
+    decision: 'Data before generation',
+    detail: 'Census, transport, and parcel data are assembled before the LLM is allowed to create a planning section.',
+    decisionIndex: 1,
+    outcome: 'Structured reports rooted in a real planning context.'
+  },
+  'audiobook-ai': {
+    mode: 'content-loop',
+    label: 'Content loop',
+    decision: 'Feedback at the product edge',
+    detail: 'Playback, subtitles, and AI interactions feed one observable experience rather than isolated endpoints.',
+    decisionIndex: 3,
+    outcome: 'Faster AI responses across a cohesive listening experience.'
+  },
+  spotwork: {
+    mode: 'trust-boundary',
+    label: 'Trust-boundary map',
+    decision: 'Tenant isolation',
+    detail: 'Identity, resolution, and data boundaries are explicit before services scale on ECS.',
+    decisionIndex: 4,
+    outcome: 'A SaaS foundation built around trust, not only tables.'
+  },
+  rvin: {
+    mode: 'knowledge-router',
+    label: 'Knowledge router',
+    decision: 'Merchant-specific knowledge',
+    detail: 'Every channel is routed through a constrained knowledge boundary before an AI reply is produced.',
+    decisionIndex: 2,
+    outcome: 'Faster support without losing business context.'
+  },
+  'ioc-logistics': {
+    mode: 'operations-line',
+    label: 'Data-to-operations line',
+    decision: 'Resilient ETL',
+    detail: 'External vessel data is normalized and made dependable before it reaches operating teams.',
+    decisionIndex: 1,
+    outcome: 'Operational visibility with less manual reporting.'
+  }
+}
 
 function ArrowIcon() {
-  return <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M8.5 3.5 13 8l-4.5 4.5" /></svg>
+  return <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 4.5 16.5 10 11 15.5" /></svg>
 }
 
-function SparkIcon() {
-  return <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m8 1 .9 5.1L14 8l-5.1.9L8 14l-.9-5.1L2 8l5.1-.9L8 1Z" /></svg>
+function BoltIcon() {
+  return <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m11.5 2-6 9h4l-1 7 6-9h-4l1-7Z" /></svg>
 }
 
-function CanopyGraphic() {
-  return <div className="canopy-graphic" aria-label="An abstract map of connected engineering systems" role="img">
-    <div className="canopy-aura canopy-aura-one" />
-    <div className="canopy-aura canopy-aura-two" />
-    <svg viewBox="0 0 640 640" fill="none" aria-hidden="true">
-      <path className="canopy-branch canopy-branch-main" d="M311 599C298 481 322 410 351 340c29-72 47-143 9-256C337 28 284 24 244 37" />
-      <path className="canopy-branch" d="M343 365c-81-20-153-4-209 45-42 37-63 82-69 127" />
-      <path className="canopy-branch" d="M337 376c75-30 152-23 213 21 42 31 67 76 80 125" />
-      <path className="canopy-branch" d="M325 285c-75-26-126-72-152-140" />
-      <path className="canopy-branch" d="M345 286c62-22 109-68 129-135" />
-      <path className="canopy-branch canopy-branch-fine" d="M120 501c64 10 125-18 172-75M492 503c-58 1-111-25-153-77M232 132c44 23 78 58 99 107M449 135c-41 22-75 58-97 106" />
-      <circle className="canopy-ring" cx="340" cy="369" r="73" />
-      <circle className="canopy-ring canopy-ring-small" cx="340" cy="369" r="29" />
-      <circle className="canopy-node canopy-node-core" cx="340" cy="369" r="9" />
-      <circle className="canopy-node" cx="119" cy="502" r="7" />
-      <circle className="canopy-node" cx="490" cy="504" r="7" />
-      <circle className="canopy-node" cx="230" cy="132" r="7" />
-      <circle className="canopy-node" cx="451" cy="135" r="7" />
-    </svg>
-    <span className="canopy-annotation canopy-annotation-one">01 / CONTEXT</span>
-    <span className="canopy-annotation canopy-annotation-two">02 / SYSTEM</span>
-    <span className="canopy-annotation canopy-annotation-three">03 / OUTCOME</span>
-  </div>
+function SystemStory({ project, compact = false }) {
+  const story = storyMeta[project.id]
+  const isDecision = (index) => index === story.decisionIndex
+
+  return <figure className={`system-story story-${story.mode} ${compact ? 'is-compact' : ''}`} aria-labelledby={`story-title-${project.id}`}>
+    <figcaption className="story-topline">
+      <span id={`story-title-${project.id}`}>{story.label}</span>
+      <span>{project.type}</span>
+    </figcaption>
+    <div key={project.id} className="story-canvas" role="img" aria-label={`${project.title}: ${project.architecture.join(', ')}. Key engineering decision: ${story.decision}.`}>
+      <div className="story-route-line" aria-hidden="true" />
+      <ol className="story-nodes">
+        {project.architecture.map((layer, index) => <li key={layer} className={isDecision(index) ? 'is-decision' : ''} style={{ '--story-step': index }}>
+          <span className="story-node-index">{String(index + 1).padStart(2, '0')}</span>
+          <strong>{layer}</strong>
+        </li>)}
+      </ol>
+    </div>
+    <div className="story-caption">
+      <p><span>Decision</span>{story.decision}</p>
+      <p><span>Why it matters</span>{story.detail}</p>
+      <p className="story-outcome"><span>Outcome</span>{story.outcome}</p>
+    </div>
+  </figure>
 }
 
-function useReveal() {
+function SceneFrame({ project, children }) {
+  const story = storyMeta[project.id]
+
+  return <figure className={`project-scene scene-${project.id}`} aria-labelledby={`scene-title-${project.id}`}>
+    <figcaption className="scene-topline">
+      <span id={`scene-title-${project.id}`}>Illustrative system scene</span>
+      <span>{story.label}</span>
+    </figcaption>
+    <div className="scene-surface">
+      {children}
+    </div>
+    <div className="scene-note">
+      <span>Engineering focus</span>
+      <strong>{story.decision}</strong>
+      <p>{story.outcome}</p>
+    </div>
+  </figure>
+}
+
+function BpclScene({ project }) {
+  return <SceneFrame project={project}>
+    <div className="scene-appbar"><strong>Charge network</strong><Badge color="blue" variant="soft">Live session</Badge></div>
+    <div className="scene-search">
+      <TextField.Root size="1" aria-label="Search location" value="Bandra, Mumbai" readOnly />
+      <Badge color="gray" variant="outline">12 nearby</Badge>
+    </div>
+    <div className="charger-grid">
+      <article><span className="charger-icon"><BoltIcon /></span><strong>CHR-1044</strong><small>50 kW · Available</small></article>
+      <article className="is-active"><span className="charger-icon"><BoltIcon /></span><strong>CHR-2048</strong><small>Session in progress</small><div className="session-progress"><span /></div></article>
+      <article><span className="charger-icon"><BoltIcon /></span><strong>CHR-1181</strong><small>22 kW · Available</small></article>
+    </div>
+    <div className="scene-event-line"><span>Start request</span><i /><span>Temporal workflow</span><i /><span>OCPI update</span></div>
+  </SceneFrame>
+}
+
+function PlanzookieScene({ project }) {
+  return <SceneFrame project={project}>
+    <div className="scene-appbar"><strong>Planning workspace</strong><Badge color="blue" variant="soft">Draft report</Badge></div>
+    <div className="planning-layout">
+      <aside className="dataset-stack"><span>Grounded context</span><b>Census 2024</b><b>Transit access</b><b>Parcel data</b><small>3 sources selected</small></aside>
+      <div className="planning-main">
+        <TextField.Root size="1" aria-label="Planning brief" value="Neighbourhood mobility brief" readOnly />
+        <div className="report-sheet"><small>Section 02 · Mobility</small><strong>Access improves along the eastern corridor.</strong><p>Transit coverage and parcel density were used to structure this recommendation.</p><div className="map-preview" aria-label="Illustrative planning map"><span /><span /><span /></div></div>
+      </div>
+    </div>
+  </SceneFrame>
+}
+
+function SpotworkScene({ project }) {
+  return <SceneFrame project={project}>
+    <div className="scene-appbar"><strong>Spotwork</strong><Badge color="blue" variant="soft">Acme tenant</Badge></div>
+    <Tabs.Root className="scene-tabs" defaultValue="roles">
+      <Tabs.List aria-label="Tenant workspace views"><Tabs.Trigger value="roles">Roles</Tabs.Trigger><Tabs.Trigger value="jobs">Jobs</Tabs.Trigger><Tabs.Trigger value="data">Data</Tabs.Trigger></Tabs.List>
+      <Tabs.Content value="roles" className="tenant-content">
+        <div><span>Signed in as</span><strong>Operations admin</strong><small>Role-based access</small></div>
+        <div className="tenant-boundary"><span>Tenant resolver</span><strong>acme.jobs</strong><small>Isolated data boundary</small></div>
+      </Tabs.Content>
+      <Tabs.Content value="jobs" className="tenant-content"><div><span>Open jobs</span><strong>24 active</strong><small>Acme workspace</small></div></Tabs.Content>
+      <Tabs.Content value="data" className="tenant-content"><div><span>Database</span><strong>acme-prod</strong><small>Tenant isolated</small></div></Tabs.Content>
+    </Tabs.Root>
+  </SceneFrame>
+}
+
+function AudiobookScene({ project }) {
+  return <SceneFrame project={project}>
+    <div className="scene-appbar"><strong>Listen</strong><Badge color="blue" variant="soft">AI subtitle</Badge></div>
+    <div className="audio-layout">
+      <div className="cover-art" aria-hidden="true"><span>07</span></div>
+      <div className="player-copy"><small>The design of everyday systems</small><strong>Chapter seven</strong><div className="waveform" aria-hidden="true">||||||||||||||||||||</div><div className="playback-line"><span>12:48</span><i /><span>36:10</span></div></div>
+    </div>
+    <div className="subtitle-state"><Badge color="gray" variant="outline">EN subtitle</Badge><span>“The route becomes useful when it is visible.”</span></div>
+  </SceneFrame>
+}
+
+function RvinScene({ project }) {
+  return <SceneFrame project={project}>
+    <div className="scene-appbar"><strong>Merchant support</strong><Badge color="blue" variant="soft">3 channels</Badge></div>
+    <div className="support-layout">
+      <aside className="channel-list"><b>WhatsApp</b><b>Instagram</b><b>Email</b></aside>
+      <div className="conversation"><small>Customer · 10:42</small><p>“Can I change the delivery address?”</p><div className="knowledge-answer"><Badge color="blue" variant="soft">Merchant policy</Badge><strong>Address changes are available before dispatch.</strong><small>Response ready for approval</small></div></div>
+    </div>
+  </SceneFrame>
+}
+
+function IocScene({ project }) {
+  return <SceneFrame project={project}>
+    <div className="scene-appbar"><strong>Vessel operations</strong><Badge color="blue" variant="soft">Synced 2 min ago</Badge></div>
+    <div className="vessel-table" role="table" aria-label="Illustrative vessel operations table">
+      <div role="row" className="vessel-heading"><span role="columnheader">Vessel</span><span role="columnheader">ETA</span><span role="columnheader">Status</span></div>
+      <div role="row"><strong role="cell">MV Horizon</strong><span role="cell">14:20</span><Badge role="cell" color="blue" variant="soft">On route</Badge></div>
+      <div role="row"><strong role="cell">MV Coastline</strong><span role="cell">16:40</span><Badge role="cell" color="gray" variant="outline">ETL review</Badge></div>
+      <div role="row"><strong role="cell">MV Meridian</strong><span role="cell">18:10</span><Badge role="cell" color="blue" variant="soft">Docked</Badge></div>
+    </div>
+  </SceneFrame>
+}
+
+function InterfaceScene({ project }) {
+  const scenes = {
+    'bpcl-ev': BpclScene,
+    planzookie: PlanzookieScene,
+    spotwork: SpotworkScene,
+    'audiobook-ai': AudiobookScene,
+    rvin: RvinScene,
+    'ioc-logistics': IocScene
+  }
+  const Scene = scenes[project.id]
+  return <Scene key={project.id} project={project} />
+}
+
+function useReducedMotion() {
+  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
-    document.documentElement.classList.add('motion-ready')
-    const targets = [...document.querySelectorAll('[data-reveal]')]
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const sync = () => setReducedMotion(query.matches)
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
+
+  return reducedMotion
+}
+
+function useReveal(reducedMotion) {
+  useEffect(() => {
+    if (reducedMotion) return undefined
     const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible')
+        entry.target.dataset.revealed = 'true'
         observer.unobserve(entry.target)
       }
-    }), { threshold: 0.1, rootMargin: '0px 0px -32px 0px' })
+    }), { threshold: 0.12, rootMargin: '0px 0px -32px 0px' })
+    const targets = document.querySelectorAll('[data-reveal]')
     targets.forEach((target) => observer.observe(target))
-    return () => {
-      observer.disconnect()
-      document.documentElement.classList.remove('motion-ready')
+    return () => observer.disconnect()
+  }, [reducedMotion])
+}
+
+function Intro({ reducedMotion }) {
+  const [visible, setVisible] = useState(!reducedMotion)
+  const [leaving, setLeaving] = useState(false)
+
+  useEffect(() => {
+    if (reducedMotion) {
+      setVisible(false)
+      return undefined
     }
-  }, [])
+    if (!visible) return undefined
+    const leaveTimer = window.setTimeout(() => setLeaving(true), 850)
+    const removeTimer = window.setTimeout(() => setVisible(false), 1150)
+    return () => {
+      window.clearTimeout(leaveTimer)
+      window.clearTimeout(removeTimer)
+    }
+  }, [reducedMotion, visible])
+
+  if (!visible) return null
+
+  return <div className={`intro ${leaving ? 'is-leaving' : ''}`} aria-label="Portfolio entry sequence">
+    <div className="intro-inner">
+      <p role="status">Loading selected work</p>
+      <div className="intro-progress" aria-hidden="true"><span /></div>
+      <span className="intro-number">00—100</span>
+      <button type="button" onClick={() => setVisible(false)}>Skip intro</button>
+    </div>
+  </div>
 }
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [])
+
   const closeMenu = () => setMenuOpen(false)
+
   return <header className="site-header">
-    <a className="brand" href="#top" aria-label="Atal Upadhyay home" onClick={closeMenu}>atalos<span>.</span></a>
+    <a className="brand" href="#top" onClick={closeMenu} aria-label="Atal Upadhyay, back to top">ATAL / UPADHYAY</a>
     <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="primary-navigation" onClick={() => setMenuOpen((open) => !open)}>
-      <span>{menuOpen ? 'Close' : 'Menu'}</span>
+      {menuOpen ? 'Close menu' : 'Open menu'}
     </button>
     <nav id="primary-navigation" className={menuOpen ? 'is-open' : ''} aria-label="Primary navigation">
-      <a href="#work" onClick={closeMenu}>Work</a>
-      <a href="#approach" onClick={closeMenu}>Approach</a>
-      <a href="#journey" onClick={closeMenu}>Journey</a>
+      <a href="#selected" onClick={closeMenu}>Selected work</a>
+      <a href="#index" onClick={closeMenu}>Index</a>
+      <a href="#practice" onClick={closeMenu}>Practice</a>
       <a href="#contact" onClick={closeMenu}>Contact</a>
     </nav>
     <a className="resume-link" href={resumeUrl} target="_blank" rel="noreferrer">Résumé <ArrowIcon /></a>
   </header>
 }
 
-function Hero() {
-  return <section id="top" className="hero">
+function Hero({ project }) {
+  return <section id="top" className="hero" aria-labelledby="portfolio-title">
     <div className="hero-copy" data-reveal>
-      <p className="eyebrow"><span /> Field notes / 01</p>
-      <h1>Useful systems, made <em>alive.</em></h1>
-      <p className="hero-lede">{profile.summary} Based in {profile.location}.</p>
+      <p className="eyebrow">Software engineer · Mumbai, India</p>
+      <h1 id="portfolio-title">Atal<br />Upadhyay</h1>
+      <p className="hero-lede">I build reliable backend systems where AI, data, and cloud infrastructure meet.</p>
       <div className="hero-actions">
-        <a className="button button-primary" href="#work">Explore the work <ArrowIcon /></a>
+        <a className="button button-primary" href="#selected">View selected work <ArrowIcon /></a>
         <a className="text-link" href={`mailto:${profile.email}`}>Start a conversation <ArrowIcon /></a>
       </div>
     </div>
-    <CanopyGraphic />
-    <div className="hero-footer" data-reveal>
-      <span>ENGINEERING PORTFOLIO / 2026</span>
-      <span>SCROLL TO FOLLOW THE WORK <ArrowIcon /></span>
+    <div className="hero-map" data-reveal>
+      <p className="hero-map-label">Currently selected</p>
+      <InterfaceScene project={project} />
+    </div>
+    <div className="hero-footer" aria-label="Portfolio summary">
+      <span>Work-first portfolio / 2026</span>
+      <span>AI · backend · cloud systems</span>
     </div>
   </section>
 }
 
-function Outcomes() {
-  return <section className="outcomes section-shell" aria-label="Selected outcomes">
-    <div className="section-rule"><span>01.</span><p>What changes when the system works</p><small>OUTCOMES</small></div>
-    <div className="outcome-list">
-      {impactStats.slice(0, 3).map((stat, index) => <article key={stat.label} data-reveal>
-        <span>0{index + 1}</span><strong>{stat.number}</strong><div><b>{stat.label}</b><p>{stat.source}</p></div>
-      </article>)}
+function SelectedWork({ project }) {
+  return <section id="selected" className="selected section-shell" aria-labelledby="selected-heading">
+    <div className="section-label"><span>01</span><p>Selected work</p></div>
+    <div className="selected-layout">
+      <div className="selected-copy" data-reveal>
+        <p className="eyebrow">{project.role}</p>
+        <h2 id="selected-heading">{project.title}</h2>
+        <p className="section-lede">{project.problem}</p>
+        <p className="project-impact">{project.impact}</p>
+      </div>
+      <div className="selected-detail" data-reveal>
+        <div className="detail-row"><span>System decision</span><p>{project.solution}</p></div>
+        <div className="detail-row"><span>Technical focus</span><p>{project.tags.join(' · ')}</p></div>
+        <div className="detail-row"><span>Engineering lesson</span><p>{project.lesson}</p></div>
+      </div>
     </div>
   </section>
 }
 
-function Work() {
-  const [activeId, setActiveId] = useState(featuredProjects[0].id)
-  const active = featuredProjects.find((project) => project.id === activeId) ?? featuredProjects[0]
-  return <section id="work" className="work section-shell">
-    <div className="section-rule"><span>02.</span><p>Selected systems</p><small>WORK</small></div>
-    <div className="work-intro" data-reveal><h2>Complexity is only useful when it <em>clears</em> the path.</h2><p>Projects selected for the technical decisions behind them—not just the tools used to ship them.</p></div>
-    <div className="work-layout" data-reveal>
-      <div className="project-index" role="tablist" aria-label="Selected projects">
-        {featuredProjects.map((project, index) => <button key={project.id} type="button" role="tab" aria-selected={project.id === active.id} className={project.id === active.id ? 'is-active' : ''} onClick={() => setActiveId(project.id)}>
-          <span>0{index + 1}</span><b>{project.title}</b><i aria-hidden="true"><ArrowIcon /></i>
+function ProjectIndex({ activeProject, onSelect }) {
+  const changeProject = (project) => {
+    onSelect(project)
+    const selectedSection = document.getElementById('selected')
+    if (!selectedSection) return
+    const top = selectedSection.getBoundingClientRect().top + window.scrollY - 76
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    window.scrollTo({ top, behavior })
+  }
+
+  const onProjectKeyDown = (event, currentIndex) => {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return
+    event.preventDefault()
+    const nextIndex = event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? projects.length - 1
+        : (currentIndex + (event.key === 'ArrowDown' ? 1 : -1) + projects.length) % projects.length
+    const nextProject = projects[nextIndex]
+    changeProject(nextProject)
+    document.getElementById(`project-tab-${nextProject.id}`)?.focus()
+  }
+
+  return <section id="index" className="project-index-section" aria-labelledby="index-heading">
+    <div className="section-shell">
+      <div className="index-heading" data-reveal>
+        <div className="section-label"><span>02</span><p>Work index</p></div>
+        <h2 id="index-heading">Projects, in a readable line.</h2>
+        <p className="section-lede">Choose a project to update the system story above. The index is the primary way to browse the work.</p>
+      </div>
+      <div className="project-list" role="tablist" aria-label="Project index" data-reveal>
+        {projects.map((project, index) => <button
+          id={`project-tab-${project.id}`}
+          key={project.id}
+          type="button"
+          role="tab"
+          aria-selected={project.id === activeProject.id}
+          aria-controls="selected-project-panel"
+          tabIndex={project.id === activeProject.id ? 0 : -1}
+          onClick={() => changeProject(project)}
+          onKeyDown={(event) => onProjectKeyDown(event, index)}
+        >
+          <span className="project-number">{String(index + 1).padStart(2, '0')}</span>
+          <strong>{project.title}</strong>
+          <span className="project-type">{project.type}</span>
+          <span className="project-role">{project.role}</span>
+          <ArrowIcon />
         </button>)}
       </div>
-      <article className="project-feature" role="tabpanel" aria-live="polite">
-        <div className="project-feature-top"><p className="eyebrow"><span /> {active.type}</p><span>{active.status}</span></div>
-        <h3>{active.title}</h3>
-        <p className="project-impact">{active.impact}</p>
-        <div className="project-story"><div><span>The tension</span><p>{active.problem}</p></div><div><span>The response</span><p>{active.solution}</p></div></div>
-        <div className="project-tags" aria-label="Technologies used">{active.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-      </article>
     </div>
   </section>
 }
 
-function Approach() {
-  return <section id="approach" className="approach section-shell">
-    <div className="section-rule"><span>03.</span><p>How the work takes shape</p><small>APPROACH</small></div>
-    <div className="approach-lede" data-reveal><h2>Every layer needs a clear <em>reason</em> to exist.</h2><p>I work from the boundary inward: understand the humans and systems involved, design reliable connections, and then make the result observable in production.</p></div>
-    <ol className="approach-list">
-      {stackLayers.map((layer, index) => <li key={layer.title} data-reveal><span>0{index + 1}</span><div><h3>{layer.title}</h3><p>{layer.tools.slice(0, 4).join(' · ')}</p></div><SparkIcon /></li>)}
-    </ol>
-  </section>
-}
-
-function Journey() {
-  return <section id="journey" className="journey section-shell">
-    <div className="section-rule"><span>04.</span><p>Growing scope through delivery</p><small>JOURNEY</small></div>
-    <div className="journey-grid"><h2 data-reveal>Built through the <em>hard parts.</em></h2><div className="timeline">
-      {timeline.map((item) => <article key={`${item.company}-${item.period}`} data-reveal><span>{item.period}</span><div><h3>{item.role}</h3><b>{item.company}</b><p>{item.highlight}</p></div></article>)}
-    </div></div>
+function Practice({ project }) {
+  return <section id="practice" className="practice section-shell" aria-labelledby="practice-heading">
+    <div className="section-label"><span>03</span><p>System practice</p></div>
+    <div className="practice-layout">
+      <div data-reveal>
+        <h2 id="practice-heading">Make the system legible before making it larger.</h2>
+        <p className="section-lede">The work moves from the operational boundary to the internal flow, then back to an observable outcome.</p>
+      </div>
+      <div id="selected-project-panel" className="practice-panel" role="tabpanel" aria-labelledby={`project-tab-${project.id}`} aria-live="polite" data-reveal>
+        <p className="panel-project">{project.title}</p>
+        <SystemStory project={project} compact />
+      </div>
+    </div>
   </section>
 }
 
 function Contact() {
-  return <section id="contact" className="contact">
-    <div className="contact-copy" data-reveal><p className="eyebrow"><span /> Open to the next system</p><h2>Let’s make the difficult part <em>work.</em></h2><p>I’m open to software engineering roles involving backend systems, AI platforms, cloud infrastructure, and automation-heavy products.</p><a className="button button-light" href={`mailto:${profile.email}`}>Email me <ArrowIcon /></a></div>
-    <div className="contact-links" data-reveal><a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowIcon /></a><a href={profile.github} target="_blank" rel="noreferrer">GitHub <ArrowIcon /></a><a href={resumeUrl} target="_blank" rel="noreferrer">Résumé <ArrowIcon /></a></div>
+  return <section id="contact" className="contact" aria-labelledby="contact-heading">
+    <div className="section-shell contact-layout">
+      <div data-reveal>
+        <p className="eyebrow">Open to the next system</p>
+        <h2 id="contact-heading">Let’s make the difficult part work.</h2>
+        <p className="section-lede">Available for backend, AI workflow, and platform engineering conversations.</p>
+      </div>
+      <div className="contact-actions" data-reveal>
+        <a className="button button-primary" href={`mailto:${profile.email}`}>Email Atal <ArrowIcon /></a>
+        <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowIcon /></a>
+        <a href={profile.github} target="_blank" rel="noreferrer">GitHub <ArrowIcon /></a>
+        <a href={resumeUrl} target="_blank" rel="noreferrer">Read résumé <ArrowIcon /></a>
+      </div>
+    </div>
   </section>
 }
 
 function Portfolio() {
-  useReveal()
-  return <main>
-    <a className="skip-link" href="#work">Skip to selected work</a>
+  const reducedMotion = useReducedMotion()
+  const [activeProject, setActiveProject] = useState(initialProject)
+  useReveal(reducedMotion)
+
+  return <Theme accentColor="blue" grayColor="gray" radius="medium" scaling="95%">
+    <Intro reducedMotion={reducedMotion} />
+    <a className="skip-link" href="#selected">Skip to selected work</a>
     <Header />
-    <Hero />
-    <Outcomes />
-    <Work />
-    <Approach />
-    <Journey />
-    <Contact />
-    <footer className="site-footer"><span>© {new Date().getFullYear()} {profile.name}</span><span>AtalOS / Systems with a human edge.</span></footer>
-  </main>
+    <main>
+      <Hero project={activeProject} />
+      <SelectedWork project={activeProject} />
+      <ProjectIndex activeProject={activeProject} onSelect={setActiveProject} />
+      <Practice project={activeProject} />
+      <Contact />
+    </main>
+    <footer className="site-footer"><span>© {new Date().getFullYear()} {profile.name}</span><span>Software engineer · systems, made clearer.</span></footer>
+  </Theme>
 }
 
-function App() { return <Portfolio /> }
-
-createRoot(document.getElementById('root')).render(<App />)
+createRoot(document.getElementById('root')).render(<Portfolio />)

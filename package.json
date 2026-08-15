@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/themes": "^3.3.0",
     "@vitejs/plugin-react": "latest",
     "react": "latest",
     "react-dom": "latest",

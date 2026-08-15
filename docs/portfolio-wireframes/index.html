@@ -1,0 +1,252 @@
+<!doctype html>
+<!--
+  Portfolio wireframe prototype.
+  Open Design binding: default / web-prototype.
+  This is a decision artifact, not the production portfolio.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Atal Upadhyay · portfolio wireframes</title>
+  <style>
+    :root {
+      --bg: #FAFAFA;
+      --surface: #FFFFFF;
+      --fg: #111111;
+      --muted: #6B6B6B;
+      --border: #E5E5E5;
+      --accent: #2F6FEB;
+      --accent-soft: color-mix(in oklch, var(--accent) 12%, transparent);
+      --fg-soft: color-mix(in oklch, var(--fg) 5%, transparent);
+      --font-display: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+      --fs-h1: clamp(48px, 8vw, 96px);
+      --fs-h2: clamp(32px, 4vw, 56px);
+      --fs-h3: 20px;
+      --fs-lead: 19px;
+      --fs-body: 16px;
+      --fs-meta: 12px;
+      --gap-xs: 8px;
+      --gap-sm: 12px;
+      --gap-md: 20px;
+      --gap-lg: 32px;
+      --gap-xl: 56px;
+      --gap-2xl: 96px;
+      --container: 1200px;
+      --gutter: 24px;
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.5; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+    p { text-wrap: pretty; }
+    h1, h2, h3 { text-wrap: balance; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+    .container { width: min(100%, var(--container)); margin-inline: auto; padding-inline: var(--gutter); }
+    .section { padding-block: clamp(48px, 8vw, var(--gap-2xl)); }
+    .section + .section { border-top: 1px solid var(--border); }
+    .stack { display: flex; flex-direction: column; }
+    .row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-md); }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-lg); }
+    .grid-1-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--gap-xl); align-items: start; }
+    .h1, h1 { font-family: var(--font-display); font-size: var(--fs-h1); line-height: .95; letter-spacing: -.055em; margin: 0; font-weight: 600; }
+    .h2, h2 { font-family: var(--font-display); font-size: var(--fs-h2); line-height: 1; letter-spacing: -.04em; margin: 0; font-weight: 600; }
+    .h3, h3 { font-size: var(--fs-h3); line-height: 1.2; letter-spacing: -.02em; margin: 0; font-weight: 600; }
+    .lead { color: var(--muted); font-size: var(--fs-lead); line-height: 1.5; max-width: 50ch; margin: 0; }
+    .meta { color: var(--muted); font-family: var(--font-mono); font-size: var(--fs-meta); letter-spacing: .03em; text-transform: uppercase; }
+    .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+    .topnav { position: sticky; top: 0; z-index: 10; background: color-mix(in oklch, var(--bg) 92%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .topnav-inner { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: var(--gap-md); }
+    .logo { font-weight: 600; letter-spacing: -.03em; }
+    .topnav nav { display: flex; gap: var(--gap-lg); }
+    .topnav nav a { color: var(--muted); font-size: 14px; }
+    .topnav nav a:hover { color: var(--fg); }
+    .btn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: 1px solid transparent; border-radius: var(--radius); font-size: 14px; font-weight: 600; transition: background .18s ease, border-color .18s ease, color .18s ease; }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+    .btn-primary:hover { background: color-mix(in oklch, var(--accent) 88%, var(--fg)); }
+    .btn-secondary { background: transparent; border-color: var(--border); color: var(--fg); }
+    .btn-secondary:hover { border-color: var(--fg); }
+    .btn-ghost { background: transparent; border-color: transparent; color: var(--fg); padding-inline: 0; }
+    .btn-arrow::after { content: "→"; margin-left: 8px; }
+    .btn-arrow:hover::after { transform: translateX(2px); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: clamp(20px, 4vw, 36px); }
+    .card-flat { background: transparent; border: 0; padding: 0; }
+    .rule { border: 0; border-top: 1px solid var(--border); margin: 0; }
+    .log-row { display: grid; grid-template-columns: 110px minmax(0, 1fr) 180px; gap: var(--gap-lg); align-items: baseline; padding: 24px 0; border-top: 1px solid var(--border); }
+    .log-row:hover h3 { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+    .pull { text-align: right; }
+    .pagefoot { padding-block: var(--gap-xl); border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+
+    @media (max-width: 920px) {
+      .grid-2, .grid-1-2 { grid-template-columns: 1fr; }
+      .log-row { grid-template-columns: 80px minmax(0, 1fr); gap: var(--gap-md); }
+      .log-row .pull { grid-column: 2; text-align: left; }
+    }
+    @media (max-width: 640px) {
+      :root { --gutter: 16px; }
+      .topnav nav { gap: var(--gap-md); }
+      .topnav nav a:nth-child(2) { display: none; }
+      .row-between { align-items: flex-start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topnav" data-od-id="topnav">
+    <div class="container topnav-inner">
+      <a class="logo" href="#entry" aria-label="Atal Upadhyay, back to entry">ATAL / UPADHYAY</a>
+      <nav aria-label="Primary navigation">
+        <a href="#selected">Selected work</a>
+        <a href="#index">Index</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a class="btn btn-ghost btn-arrow" href="mailto:atal.upadhyay98@gmail.com">Email</a>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="section" id="entry" data-od-id="entry-loader">
+      <div class="container grid-2" style="align-items: end; min-height: 55vh;">
+        <div class="stack" style="gap: 28px;">
+          <p class="meta">01 / entry sequence — wireframe</p>
+          <h1>Atal<br />Upadhyay</h1>
+          <p class="lead">Software engineer building backend systems where AI, data, and cloud infrastructure meet.</p>
+          <a class="btn btn-secondary btn-arrow" href="#selected" style="width: fit-content;">Skip to selected work</a>
+        </div>
+        <div class="card" aria-label="Loader and name reveal wireframe">
+          <div class="row-between">
+            <span class="meta">Loading selected work</span>
+            <span class="meta num">78%</span>
+          </div>
+          <div style="height: 2px; margin-block: 22px; background: var(--border);">
+            <div style="width: 78%; height: 100%; background: var(--accent);"></div>
+          </div>
+          <p style="margin: 0; max-width: 34ch; color: var(--muted);">Loader is tied to real initial assets in production. It is optional, skippable, and removed when reduced motion is requested.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="selected" data-od-id="selected-work">
+      <div class="container grid-1-2">
+        <div class="stack" style="gap: 16px; position: sticky; top: 96px;">
+          <p class="meta">02 / selected work</p>
+          <h2>BPCL-EV charging platform</h2>
+          <p class="lead">Protocol and microservices architecture for discovery, tariffs, orders, and charging-session lifecycle updates.</p>
+          <p class="meta">Backend / platform engineer · 2025–26</p>
+          <a class="btn btn-primary btn-arrow" href="#case" style="width: fit-content;">Open system story</a>
+        </div>
+        <div class="card" aria-label="Selected project visual placeholder" style="min-height: 480px; display: grid; place-items: center; overflow: hidden;">
+          <svg viewBox="0 0 720 430" role="img" aria-label="A wireframe system map for the EV charging platform" style="width: 100%; height: auto; color: var(--fg);">
+            <rect x="32" y="32" width="656" height="366" fill="none" stroke="currentColor" stroke-width="1" opacity=".2" />
+            <text x="62" y="76" fill="currentColor" font-family="ui-monospace, monospace" font-size="14" opacity=".55">SELECTED CASE / SYSTEM VIEW</text>
+            <rect x="78" y="130" width="150" height="74" fill="none" stroke="currentColor" stroke-width="1" />
+            <text x="98" y="161" fill="currentColor" font-family="ui-monospace, monospace" font-size="14">USER APP</text>
+            <text x="98" y="184" fill="currentColor" font-family="ui-monospace, monospace" font-size="12" opacity=".6">discovery / order</text>
+            <path d="M228 167 H310" fill="none" stroke="currentColor" stroke-width="1" opacity=".55" />
+            <path d="M304 162 L314 167 L304 172" fill="none" stroke="currentColor" stroke-width="1" opacity=".55" />
+            <rect x="314" y="130" width="150" height="74" fill="none" stroke="currentColor" stroke-width="1" />
+            <text x="334" y="161" fill="currentColor" font-family="ui-monospace, monospace" font-size="14">PROTOCOL</text>
+            <text x="334" y="184" fill="currentColor" font-family="ui-monospace, monospace" font-size="12" opacity=".6">Beckn / OCPI</text>
+            <path d="M464 167 H546" fill="none" stroke="currentColor" stroke-width="1" opacity=".55" />
+            <path d="M540 162 L550 167 L540 172" fill="none" stroke="currentColor" stroke-width="1" opacity=".55" />
+            <rect x="550" y="130" width="108" height="74" fill="none" stroke="currentColor" stroke-width="1" />
+            <text x="570" y="161" fill="currentColor" font-family="ui-monospace, monospace" font-size="14">CPO</text>
+            <text x="570" y="184" fill="currentColor" font-family="ui-monospace, monospace" font-size="12" opacity=".6">network</text>
+            <path d="M389 204 V274" fill="none" stroke="currentColor" stroke-width="1" opacity=".55" />
+            <path d="M384 268 L389 278 L394 268" fill="none" stroke="currentColor" stroke-width="1" opacity=".55" />
+            <rect x="260" y="278" width="258" height="74" fill="none" stroke="currentColor" stroke-width="1" />
+            <text x="282" y="309" fill="currentColor" font-family="ui-monospace, monospace" font-size="14">FASTAPI / TEMPORAL / REDIS</text>
+            <text x="282" y="332" fill="currentColor" font-family="ui-monospace, monospace" font-size="12" opacity=".6">orchestration / state / caching</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="index" data-od-id="project-index">
+      <div class="container">
+        <div class="row-between" style="margin-bottom: 48px;">
+          <div class="stack" style="gap: 12px;">
+            <p class="meta">03 / work index</p>
+            <h2>Projects as a readable index.</h2>
+          </div>
+          <p class="lead" style="font-size: 16px; max-width: 30ch;">Rows are the primary browsing system. Full case-study visuals arrive after a project is chosen.</p>
+        </div>
+        <div>
+          <a class="log-row" href="#case">
+            <span class="meta num">2025–26</span>
+            <div><h3>BPCL-EV Charging Platform</h3><p style="margin: 6px 0 0; color: var(--muted);">Protocol + microservices system</p></div>
+            <span class="pull meta">Backend / platform</span>
+          </a>
+          <a class="log-row" href="#case">
+            <span class="meta num">2024–25</span>
+            <div><h3>Planzookie AI Planning Platform</h3><p style="margin: 6px 0 0; color: var(--muted);">AI + real-world data platform</p></div>
+            <span class="pull meta">Backend / AI workflows</span>
+          </a>
+          <a class="log-row" href="#case">
+            <span class="meta num">2024–25</span>
+            <div><h3>Spotwork Multi-Tenant SaaS Job Board</h3><p style="margin: 6px 0 0; color: var(--muted);">SaaS infrastructure</p></div>
+            <span class="pull meta">Backend architecture</span>
+          </a>
+          <a class="log-row" href="#case">
+            <span class="meta num">2023–24</span>
+            <div><h3>IOC Shipping &amp; Logistics Platform</h3><p style="margin: 6px 0 0; color: var(--muted);">Enterprise logistics system</p></div>
+            <span class="pull meta">Software development</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="case" data-od-id="case-study">
+      <div class="container grid-1-2">
+        <div class="stack" style="gap: 16px;">
+          <p class="meta">04 / case study module</p>
+          <h2>Explain the system, not just the stack.</h2>
+          <p class="lead">The visual is always tied to one clear engineering decision. It serves the narrative rather than decorating it.</p>
+        </div>
+        <div class="stack" style="gap: 0;">
+          <article class="card card-flat" style="padding: 24px 0; border-bottom: 1px solid var(--border);">
+            <p class="meta">Context</p>
+            <h3 style="margin-top: 10px;">Distributed charging networks need reliable state across multiple partners.</h3>
+          </article>
+          <article class="card card-flat" style="padding: 24px 0; border-bottom: 1px solid var(--border);">
+            <p class="meta">System decision</p>
+            <h3 style="margin-top: 10px;">Temporal workflows coordinate asynchronous orders and session updates; Redis shortens critical read paths.</h3>
+          </article>
+          <article class="card card-flat" style="padding: 24px 0; border-bottom: 1px solid var(--border);">
+            <p class="meta">Outcome</p>
+            <h3 style="margin-top: 10px;">Session initiation latency reduced by <span class="num">35%</span> through async workflows and caching.</h3>
+          </article>
+          <a class="btn btn-ghost btn-arrow" href="#index" style="width: fit-content; margin-top: 24px;">Next project: Planzookie AI Planning Platform</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact" data-od-id="contact-cta" style="text-align: center;">
+      <div class="container" style="max-width: 760px;">
+        <p class="meta">05 / contact</p>
+        <h2 style="margin-top: 18px;">Have a system worth making clearer?</h2>
+        <p class="lead" style="margin: 18px auto 32px;">Available for backend, AI workflow, and platform engineering conversations.</p>
+        <a class="btn btn-primary btn-arrow" href="mailto:atal.upadhyay98@gmail.com">Start a conversation</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pagefoot" data-od-id="footer">
+    <div class="container row-between">
+      <span>© 2026 Atal Upadhyay</span>
+      <span class="meta">Wireframe exploration · not final production UI</span>
+    </div>
+  </footer>
+</body>
+</html>

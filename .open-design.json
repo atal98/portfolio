@@ -1,9 +1,12 @@
 {
   "version": 1,
-  "designSystem": null,
+  "designSystem": {
+    "slug": "default",
+    "path": "design-systems/default"
+  },
   "skill": {
-    "slug": "open-design-landing",
-    "path": "design-templates/open-design-landing",
+    "slug": "web-prototype",
+    "path": "design-templates/web-prototype",
     "kind": "design-template",
     "mode": "prototype"
   },
