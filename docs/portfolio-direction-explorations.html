@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Atalos — Portfolio direction explorations</title>
+  <style>
+    :root { color-scheme: light; --ink: #101116; --paper: #f8f7f4; --line: rgba(16,17,22,.16); }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: #e9e8e4; color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button { font: inherit; }
+    .masthead { position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; padding: 15px clamp(20px,4vw,64px); background: rgba(248,247,244,.88); border-bottom: 1px solid var(--line); backdrop-filter: blur(18px); }
+    .masthead b { font-size: 12px; letter-spacing: .11em; text-transform: uppercase; }
+    .masthead span { color:#585b65; font-size: 12px; }
+    .masthead nav { display:flex; gap: 8px; }
+    .masthead a { border: 1px solid var(--line); border-radius: 999px; color: inherit; padding: 8px 12px; text-decoration: none; font-size: 12px; }
+    .intro { max-width: 1400px; margin: 0 auto; padding: clamp(48px,8vw,120px) clamp(20px,4vw,64px) 56px; display:grid; grid-template-columns: 1fr 1.5fr; gap: 48px; align-items:end; }
+    .eyebrow { display:flex; align-items:center; gap:10px; margin:0 0 16px; color:#5b5e68; font-size:11px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; }
+    .eyebrow i { width: 28px; height:1px; background: currentColor; }
+    h1 { max-width: 10ch; margin: 0; font-size: clamp(42px,6vw,92px); line-height:.91; letter-spacing:-.075em; }
+    .intro p { max-width: 46ch; margin: 0 0 4px; color:#4b4e56; font-size: clamp(17px,1.7vw,23px); line-height:1.38; }
+    .rule { max-width: 1400px; margin:0 auto; border-top: 1px solid var(--line); }
+    .concept { padding: 104px clamp(20px,4vw,64px); }
+    .concept-wrap { max-width: 1400px; margin:0 auto; }
+    .concept-head { display:grid; grid-template-columns: 150px 1fr 290px; gap:24px; margin: 0 0 26px; align-items:end; }
+    .num { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; letter-spacing:.08em; }
+    .concept h2 { margin:0; font-size:clamp(34px,4vw,62px); letter-spacing:-.065em; line-height:.94; }
+    .concept-head p { margin:0; color:#555862; font-size:14px; line-height:1.45; }
+    .frame { position:relative; overflow:hidden; min-height:720px; border-radius: 22px; box-shadow: 0 18px 48px rgba(24,25,33,.12); }
+    .frame:before { content:""; position:absolute; inset:0; pointer-events:none; border:1px solid rgba(255,255,255,.38); border-radius:inherit; z-index:12; }
+    .browser { height:42px; position:relative; z-index:10; display:flex; align-items:center; gap:7px; padding:0 17px; border-bottom:1px solid currentColor; opacity:.72; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .dots { display:flex; gap:4px; margin-right:8px; } .dots i { width:6px; height:6px; border-radius:50%; background:currentColor; }
+    .wire-label { position:absolute; z-index:15; right:18px; top:60px; border:1px solid currentColor; border-radius:999px; padding:7px 10px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; }
+    .subnote { margin:16px 0 0; color:#5d6068; font-size:13px; line-height:1.5; }
+    /* Direction A */
+    .prism { color:#11142a; background:#fbfbf8; }
+    .prism .blob { position:absolute; border-radius:999px; filter: blur(1px); transform:rotate(-18deg); }
+    .prism .b1 { right:-3%; top:50px; width:60%; height:82%; background:linear-gradient(145deg,#b7ffcf 5%,#94eaff 48%,#7e6dff 100%); }
+    .prism .b2 { right:14%; top:175px; width:25%; height:61%; background:#f2f9ce; mix-blend-mode:screen; opacity:.85; }
+    .prism .b3 { right:4%; bottom:20px; width:45%; height:33%; background:#d7c9ff; opacity:.76; }
+    .prism-ui { position:relative; z-index:2; padding: 40px 5.5% 60px; }
+    .prism-nav { display:flex; align-items:center; justify-content:space-between; font-size:13px; }
+    .prism-brand { font-weight:800; font-size:18px; letter-spacing:-.06em; }
+    .prism-links { display:flex; gap:22px; color:#3e4154; } .prism-links span:last-child { font-weight:700; color:inherit; }
+    .prism-hero { min-height:513px; padding-top:76px; display:grid; grid-template-columns:1.1fr .9fr; }
+    .prism-hero h3 { position:relative; z-index:3; max-width:10ch; margin:0; font-size:clamp(56px,6vw,98px); line-height:.86; letter-spacing:-.085em; }
+    .prism-hero h3 em { font-family: Georgia,serif; font-weight:400; }
+    .prism-hero p { align-self:end; position:relative; z-index:3; max-width:27ch; margin:0 0 10px; font-size:16px; line-height:1.45; }
+    .prism-actions { position:relative; z-index:3; display:flex; gap:9px; margin-top:28px; }
+    .prism-actions b, .prism-actions span { display:inline-flex; align-items:center; border-radius:999px; padding:12px 16px; font-size:13px; }
+    .prism-actions b { background:#12142b; color:white; } .prism-actions span { border:1px solid rgba(18,20,43,.25); }
+    .prism-bottom { position:relative; z-index:3; display:grid; grid-template-columns:1fr 1fr 1fr; border-top:1px solid rgba(18,20,43,.18); }
+    .prism-bottom div { padding:17px 16px 0 0; font-size:12px; } .prism-bottom div+div { border-left:1px solid rgba(18,20,43,.18); padding-left:16px; }
+    .prism-bottom b { display:block; margin-bottom:5px; font-size:11px; text-transform:uppercase; letter-spacing:.1em; }
+    /* Direction B */
+    .edition { background:#faf3e4; color:#1e1721; }
+    .edition .orange { position:absolute; width:62%; height:100%; right:0; top:0; background:#ff5b35; }
+    .edition .blue-orb { position:absolute; width:49%; aspect-ratio:1; right:9%; top:22%; border-radius:50%; background:#1c3cf4; }
+    .edition .pink-arc { position:absolute; width:38%; height:55%; right:26%; bottom:-20%; border:65px solid #f4a5c7; border-radius:50%; transform:rotate(25deg); }
+    .edition-ui { position:relative; z-index:2; padding: 34px 4.7% 0; }
+    .edition-nav { display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:700; }
+    .edition-nav strong { letter-spacing:-.07em; font-size:21px; } .edition-nav span { border-bottom:1px solid; padding-bottom:2px; }
+    .edition-hero { display:grid; grid-template-columns: 1.05fr .95fr; min-height:485px; padding-top:52px; }
+    .edition-hero h3 { max-width:7ch; margin:0; font-size:clamp(70px,8vw,132px); line-height:.74; letter-spacing:-.105em; }
+    .edition-hero h3 small { display:block; margin:17px 0 0 6px; font-family:ui-monospace,monospace; font-size:11px; letter-spacing:.1em; line-height:1; }
+    .edition-side { align-self:end; justify-self:end; width:min(100%,280px); padding:18px 0; border-top:1px solid rgba(30,23,33,.5); }
+    .edition-side p { font-size:16px; line-height:1.35; margin:0 0 38px; } .edition-side b { font-size:12px; }
+    .edition-strip { display:grid; grid-template-columns: 1fr 1.2fr .7fr; margin: 0 -5.1%; color:white; background:#1f1730; }
+    .edition-strip div { min-height:132px; padding:18px 24px; border-right:1px solid rgba(255,255,255,.3); } .edition-strip b { display:block; margin-bottom:38px; font-size:11px; letter-spacing:.11em; text-transform:uppercase; } .edition-strip span { font-size:21px; letter-spacing:-.045em; }
+    /* Direction C */
+    .field { color:#f4f0e9; background:#17281f; }
+    .field:after { content:""; position:absolute; inset:42px 0 0; background:radial-gradient(circle at 78% 35%,#b3f54f 0 4%,transparent 21%),radial-gradient(circle at 68% 84%,#c286ff 0 2%,transparent 20%),linear-gradient(115deg,#17281f 9%,#31583c 60%,#679956 100%); opacity:.98; }
+    .field-ui { position:relative; z-index:2; padding: 34px 5.5% 0; }
+    .field-nav { display:flex; justify-content:space-between; align-items:center; font-size:12px; } .field-nav strong { font-size:18px; letter-spacing:-.075em; } .field-nav span { padding:8px 12px; border:1px solid rgba(244,240,233,.45); border-radius:999px; }
+    .field-grid { position:relative; min-height:562px; display:grid; grid-template-columns:.92fr 1.08fr; grid-template-rows:1fr auto; padding-top:75px; }
+    .field-grid h3 { max-width:9ch; margin:0; font-size:clamp(54px,6vw,100px); line-height:.84; letter-spacing:-.09em; } .field-grid h3 em { color:#d0ff6c; font-family: Georgia,serif; font-weight:400; }
+    .field-orbit { position:absolute; right:4%; top:88px; width:49%; aspect-ratio:1; border:1px solid rgba(244,240,233,.55); border-radius:50%; }
+    .field-orbit:before,.field-orbit:after { content:""; position:absolute; border:1px solid rgba(244,240,233,.4); border-radius:50%; } .field-orbit:before { inset:16%; } .field-orbit:after { inset:34%; }
+    .field-orbit i { position:absolute; width:12px; height:12px; border-radius:50%; background:#d0ff6c; top:15%; left:24%; box-shadow: 88px 160px 0 #c286ff, 247px 73px 0 #f4f0e9; }
+    .field-copy { grid-column:2; align-self:end; justify-self:end; position:relative; z-index:3; max-width:290px; padding-bottom:42px; font-size:16px; line-height:1.4; }
+    .field-footer { position:relative; z-index:3; display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(244,240,233,.4); padding:17px 0; font-size:12px; } .field-footer b { color:#d0ff6c; }
+    .direction-notes { display:grid; grid-template-columns: repeat(3,1fr); gap:1px; margin-top:1px; background:#d4d2cd; border-radius:0 0 15px 15px; overflow:hidden; }
+    .direction-notes div { padding:18px; background:#f8f7f4; } .direction-notes b { display:block; margin-bottom:8px; font-size:10px; letter-spacing:.12em; text-transform:uppercase; } .direction-notes p { margin:0; color:#52555e; font-size:13px; line-height:1.4; }
+    .final { max-width:1400px; margin:0 auto; padding:30px clamp(20px,4vw,64px) 84px; color:#555861; font-size:13px; }
+    @media (max-width: 760px) { .masthead span,.masthead nav a:not(:first-child){display:none}.intro,.concept-head{grid-template-columns:1fr;gap:20px}.concept{padding:64px 20px}.frame{min-height:600px;border-radius:14px}.prism-links{display:none}.prism-hero,.edition-hero{grid-template-columns:1fr}.prism-hero{padding-top:55px}.prism-hero p{align-self:start;margin-top:34px}.prism-bottom{grid-template-columns:1fr}.prism-bottom div+div{border-left:0;border-top:1px solid rgba(18,20,43,.18);padding-left:0;margin-top:10px;padding-top:10px}.edition .orange{width:100%;opacity:.75}.edition-side{justify-self:start;align-self:start;margin-top:30px}.edition-strip{grid-template-columns:1fr}.edition-strip div{min-height:auto;border-right:0;border-top:1px solid rgba(255,255,255,.3)}.field-grid{grid-template-columns:1fr;min-height:490px}.field-orbit{width:70%;top:230px}.field-copy{grid-column:1;align-self:end;justify-self:start}.direction-notes{grid-template-columns:1fr}.browser{font-size:8px} }
+    @media (prefers-reduced-motion: no-preference) { .blob { animation: drift 12s ease-in-out infinite alternate; } .blue-orb { animation: breathe 7s ease-in-out infinite alternate; } .field-orbit { animation: orbit 18s linear infinite; } @keyframes drift {to{transform:rotate(-10deg) translate(-14px,12px)}} @keyframes breathe {to{transform:scale(1.06)}} @keyframes orbit {to{transform:rotate(360deg)}} }
+  </style>
+</head>
+<body>
+  <header class="masthead"><b>Atalos / direction study</b><span>Three visual identities · desktop first · not production UI</span><nav><a href="#prism">01 Prism</a><a href="#edition">02 Edition</a><a href="#field">03 Field</a></nav></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow"><i></i> Design exploration</p><h1>Three ways this portfolio can feel unmistakably yours.</h1></div><p>Each route combines AuthKit’s clean product confidence with Shopify Editions’ story-led launch energy. They are intentionally different in tone, pacing, and colour—not just variations of one layout.</p></section>
+    <div class="rule"></div>
+
+    <section class="concept" id="prism"><div class="concept-wrap"><div class="concept-head"><span class="num">01 / PRISM</span><h2>Quiet interface, vivid signal.</h2><p>Closest to AuthKit: generous white space, clear controls, a single luminous visual field and a calm engineering voice.</p></div>
+      <article class="frame prism"><div class="browser"><span class="dots"><i></i><i></i><i></i></span>atalos.dev / home</div><span class="wire-label">responsive hero</span><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><div class="prism-ui"><nav class="prism-nav"><span class="prism-brand">atalos.</span><span class="prism-links"><span>Selected work</span><span>About</span><span>Contact ↗</span></span></nav><div class="prism-hero"><div><h3>Engineering <em>clarity</em> for complex systems.</h3><div class="prism-actions"><b>View selected work</b><span>Read my approach</span></div></div><p>I design and build reliable digital products—where technical depth is felt, not announced.</p></div><div class="prism-bottom"><div><b>Now</b>Building at the edge of product &amp; systems.</div><div><b>Selected work</b>Three deeply told case studies.</div><div><b>Availability</b>Open to thoughtful collaborations.</div></div></div></article>
+      <div class="direction-notes"><div><b>Visual thesis</b><p>Product-grade precision softened by a moving colour field.</p></div><div><b>Content rhythm</b><p>Poster hero → focused case studies → process → direct contact.</p></div><div><b>Motion</b><p>Colour field slowly drifts; navigation and project transitions are quick and direct.</p></div></div><p class="subnote">Best if you want recruiters and collaborators to feel immediate confidence: modern, clear, technical, and warm without becoming a SaaS homepage.</p></div></section>
+
+    <section class="concept" id="edition"><div class="concept-wrap"><div class="concept-head"><span class="num">02 / EDITION</span><h2>Your career as a release.</h2><p>Closest to Shopify Editions: launch-level type, collectible chapters, colour with purpose, and a scroll that feels like discovering an issue.</p></div>
+      <article class="frame edition"><div class="browser"><span class="dots"><i></i><i></i><i></i></span>atalos.dev / edition 01</div><span class="wire-label">story-led index</span><span class="orange"></span><span class="blue-orb"></span><span class="pink-arc"></span><div class="edition-ui"><nav class="edition-nav"><strong>ATALOS®</strong><span>INDEX / 2026</span></nav><div class="edition-hero"><div><h3>MAKE<br>USEFUL<br>THINGS.<small>Portfolio edition / 01</small></h3></div><div class="edition-side"><p>A developer portfolio told as an annual release: the problems, the systems, the outcomes.</p><b>ENTER THE ISSUE ↓</b></div></div><div class="edition-strip"><div><b>01 / Work</b><span>Shipped systems</span></div><div><b>02 / Notes</b><span>How the work gets made</span></div><div><b>03 / Contact</b><span>Start a conversation</span></div></div></div></article>
+      <div class="direction-notes"><div><b>Visual thesis</b><p>An ownable, launch-like identity: bright, editorial, and unafraid to take space.</p></div><div><b>Content rhythm</b><p>Issue cover → chapter index → work releases → notes → a final invitation.</p></div><div><b>Motion</b><p>Chapter changes use a short colour wipe; the active section number updates as a clear orientation cue.</p></div></div><p class="subnote">Best if you want a memorable personal brand. It can carry projects from different industries because the “edition” becomes the unifying idea.</p></div></section>
+
+    <section class="concept" id="field"><div class="concept-wrap"><div class="concept-head"><span class="num">03 / FIELD</span><h2>A portfolio with living systems energy.</h2><p>The hybrid route: product-like restraint from AuthKit, a narrative index from Shopify, and a deeper, more atmospheric—but not 3D—world.</p></div>
+      <article class="frame field"><div class="browser"><span class="dots"><i></i><i></i><i></i></span>atalos.dev / field notes</div><span class="wire-label">ambient system</span><div class="field-ui"><nav class="field-nav"><strong>atalos / field notes</strong><span>Explore the work ↗</span></nav><div class="field-grid"><h3>Systems with a <em>human</em> edge.</h3><div class="field-orbit"><i></i></div><p class="field-copy">A quieter, more personal reading of engineering: projects appear as connected systems rather than a stack of portfolio cards.</p></div><footer class="field-footer"><span>FIELD Nº 01 · ENGINEERING PORTFOLIO</span><b>SCROLL TO TRACE THE WORK ↓</b></footer></div></article>
+      <div class="direction-notes"><div><b>Visual thesis</b><p>A rich living background gives the portfolio atmosphere while type and navigation remain disciplined.</p></div><div><b>Content rhythm</b><p>One continuous field → project constellations → close-up project pages → contact.</p></div><div><b>Motion</b><p>Slow orbiting markers establish connection; all reading and navigation stays still, fast, and accessible.</p></div></div><p class="subnote">Best if you still want a sense of immersion from the original concept, but expressed through motion, type, and colour rather than a literal 3D world.</p></div></section>
+  </main>
+  <footer class="final">Design board only. The next step is to select one direction (or a specific mix), then I will create a proper desktop + mobile wireframe for that route before we touch the portfolio application.</footer>
+</body>
+</html>

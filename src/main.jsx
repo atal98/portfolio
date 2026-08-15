@@ -1,129 +1,175 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import Lenis from 'lenis'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import * as THREE from 'three'
 import './styles.css'
 import { impactStats, profile, projects, stackLayers, timeline } from './data/portfolio'
-import ExperienceShell from './experience/ExperienceShell'
-
-gsap.registerPlugin(ScrollTrigger)
 
 const resumeUrl = `${import.meta.env.BASE_URL}atal-upadhyay-resume.pdf`
-const featuredProjects = projects.filter((project) => ['bpcl-ev', 'spotwork', 'planzookie'].includes(project.id))
-const supportingProjects = projects.filter((project) => !featuredProjects.includes(project))
+const featuredProjects = projects.filter((project) => project.featured).slice(0, 3)
 
-function useScrollReveal() {
-  useEffect(() => {
-    const targets = document.querySelectorAll('[data-reveal]')
-    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
-      if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target) }
-    }), { threshold: 0.12, rootMargin: '0px 0px -48px 0px' })
-    targets.forEach((target) => observer.observe(target))
-    return () => observer.disconnect()
-  }, [])
+function ArrowIcon() {
+  return <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h11M8.5 3.5 13 8l-4.5 4.5" /></svg>
 }
 
-function useMatrixInteraction() {
-  useMotionSystem()
-  useSystemCanvas()
-  useEffect(() => {
-    if (!document.querySelector('main')) return undefined
-    if (!window.matchMedia('(hover:hover)').matches) return undefined
-    const main = document.querySelector('main')
-    const targetSelector = 'a, button, h1, h2, h3, .hero-copy p, .section-title p, .case-study, .more-work article, .capability-grid article, .timeline article, .contact'
-    let timer
-    const setPosition = (event, name) => {
-      document.documentElement.style.setProperty(`--${name}-x`, `${(event.clientX / window.innerWidth) * 100}%`)
-      document.documentElement.style.setProperty(`--${name}-y`, `${(event.clientY / window.innerHeight) * 100}%`)
-    }
-    const onMove = (event) => {
-      setPosition(event, 'pointer')
-      if (event.target.closest(targetSelector)) { setPosition(event, 'matrix'); main?.classList.add('matrix-engaged') } else main?.classList.remove('matrix-engaged')
-    }
-    const onClick = (event) => {
-      if (!event.target.closest(targetSelector)) return
-      setPosition(event, 'matrix'); main?.classList.add('matrix-pulse')
-      clearTimeout(timer); timer = setTimeout(() => main?.classList.remove('matrix-pulse'), 520)
-    }
-    window.addEventListener('pointermove', onMove, { passive: true })
-    window.addEventListener('click', onClick, { passive: true })
-    return () => { clearTimeout(timer); window.removeEventListener('pointermove', onMove); window.removeEventListener('click', onClick) }
-  }, [])
+function SparkIcon() {
+  return <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m8 1 .9 5.1L14 8l-5.1.9L8 14l-.9-5.1L2 8l5.1-.9L8 1Z" /></svg>
 }
 
-function useMotionSystem() {
+function CanopyGraphic() {
+  return <div className="canopy-graphic" aria-label="An abstract map of connected engineering systems" role="img">
+    <div className="canopy-aura canopy-aura-one" />
+    <div className="canopy-aura canopy-aura-two" />
+    <svg viewBox="0 0 640 640" fill="none" aria-hidden="true">
+      <path className="canopy-branch canopy-branch-main" d="M311 599C298 481 322 410 351 340c29-72 47-143 9-256C337 28 284 24 244 37" />
+      <path className="canopy-branch" d="M343 365c-81-20-153-4-209 45-42 37-63 82-69 127" />
+      <path className="canopy-branch" d="M337 376c75-30 152-23 213 21 42 31 67 76 80 125" />
+      <path className="canopy-branch" d="M325 285c-75-26-126-72-152-140" />
+      <path className="canopy-branch" d="M345 286c62-22 109-68 129-135" />
+      <path className="canopy-branch canopy-branch-fine" d="M120 501c64 10 125-18 172-75M492 503c-58 1-111-25-153-77M232 132c44 23 78 58 99 107M449 135c-41 22-75 58-97 106" />
+      <circle className="canopy-ring" cx="340" cy="369" r="73" />
+      <circle className="canopy-ring canopy-ring-small" cx="340" cy="369" r="29" />
+      <circle className="canopy-node canopy-node-core" cx="340" cy="369" r="9" />
+      <circle className="canopy-node" cx="119" cy="502" r="7" />
+      <circle className="canopy-node" cx="490" cy="504" r="7" />
+      <circle className="canopy-node" cx="230" cy="132" r="7" />
+      <circle className="canopy-node" cx="451" cy="135" r="7" />
+    </svg>
+    <span className="canopy-annotation canopy-annotation-one">01 / CONTEXT</span>
+    <span className="canopy-annotation canopy-annotation-two">02 / SYSTEM</span>
+    <span className="canopy-annotation canopy-annotation-three">03 / OUTCOME</span>
+  </div>
+}
+
+function useReveal() {
   useEffect(() => {
-    if (!document.querySelector('.hero')) return undefined
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined
-    const lenis = new Lenis({ autoRaf: false, lerp: 0.1 })
-    const tick = (time) => lenis.raf(time * 1000)
-    gsap.ticker.add(tick)
-    lenis.on('scroll', ScrollTrigger.update)
-    const context = gsap.context(() => {
-      gsap.utils.toArray('.section-title').forEach((title) => gsap.fromTo(title,
-        { y: 34, opacity: 0.2 },
-        { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: title, start: 'top 82%', once: true } }
-      ))
-      gsap.to('.signal-field', { yPercent: -8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } })
-    })
-    ScrollTrigger.refresh()
-    return () => { context.revert(); lenis.destroy(); gsap.ticker.remove(tick) }
+    document.documentElement.classList.add('motion-ready')
+    const targets = [...document.querySelectorAll('[data-reveal]')]
+    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible')
+        observer.unobserve(entry.target)
+      }
+    }), { threshold: 0.1, rootMargin: '0px 0px -32px 0px' })
+    targets.forEach((target) => observer.observe(target))
+    return () => {
+      observer.disconnect()
+      document.documentElement.classList.remove('motion-ready')
+    }
   }, [])
 }
 
-function useSystemCanvas() {
-  const canvasRef = React.useRef(null)
-  useEffect(() => {
-    const canvas = canvasRef.current || document.createElement('canvas')
-    const host = document.querySelector('.signal-field')
-    if (!host) return undefined
-    if (!canvas.parentNode && host) host.prepend(canvas)
-    if (!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(hover: hover)').matches) return undefined
-    const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100)
-    camera.position.z = 6
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
-    const group = new THREE.Group()
-    scene.add(group)
-    const points = [[0, 0, 0], [-1.85, 1.05, 0.15], [1.7, 1.15, -0.2], [1.15, -1.45, 0.3], [-1.2, -1.35, -0.25]]
-    const pointGeometry = new THREE.BufferGeometry()
-    pointGeometry.setAttribute('position', new THREE.Float32BufferAttribute(points.flat(), 3))
-    group.add(new THREE.Points(pointGeometry, new THREE.PointsMaterial({ color: 0x99e5ba, size: 0.09, transparent: true, opacity: 0.9 })))
-    const lineGeometry = new THREE.BufferGeometry()
-    lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(points.slice(1).flatMap(([x, y, z]) => [0, 0, 0, x, y, z]), 3))
-    group.add(new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({ color: 0x71d7fa, transparent: true, opacity: 0.35 })))
-    const ring = new THREE.Mesh(new THREE.RingGeometry(0.72, 0.74, 64), new THREE.MeshBasicMaterial({ color: 0x71d7fa, transparent: true, opacity: 0.65, side: THREE.DoubleSide }))
-    group.add(ring)
-    const target = new THREE.Vector2()
-    const pointer = new THREE.Vector2()
-    const resize = () => { const { width, height } = canvas.getBoundingClientRect(); renderer.setSize(width, height, false); camera.aspect = width / height; camera.updateProjectionMatrix() }
-    const move = (event) => { target.x = (event.clientX / window.innerWidth - 0.5) * 0.35; target.y = (event.clientY / window.innerHeight - 0.5) * -0.25 }
-    const startedAt = performance.now()
-    let frame
-    const render = () => { pointer.lerp(target, 0.04); group.rotation.y = ((performance.now() - startedAt) / 1000) * 0.08 + pointer.x; group.rotation.x = pointer.y; ring.rotation.z += 0.004; renderer.render(scene, camera); frame = requestAnimationFrame(render) }
-    resize(); render(); window.addEventListener('resize', resize); window.addEventListener('pointermove', move, { passive: true })
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('resize', resize); window.removeEventListener('pointermove', move); pointGeometry.dispose(); lineGeometry.dispose(); renderer.dispose() }
-  }, [])
+function Header() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = () => setMenuOpen(false)
+  return <header className="site-header">
+    <a className="brand" href="#top" aria-label="Atal Upadhyay home" onClick={closeMenu}>atalos<span>.</span></a>
+    <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="primary-navigation" onClick={() => setMenuOpen((open) => !open)}>
+      <span>{menuOpen ? 'Close' : 'Menu'}</span>
+    </button>
+    <nav id="primary-navigation" className={menuOpen ? 'is-open' : ''} aria-label="Primary navigation">
+      <a href="#work" onClick={closeMenu}>Work</a>
+      <a href="#approach" onClick={closeMenu}>Approach</a>
+      <a href="#journey" onClick={closeMenu}>Journey</a>
+      <a href="#contact" onClick={closeMenu}>Contact</a>
+    </nav>
+    <a className="resume-link" href={resumeUrl} target="_blank" rel="noreferrer">Résumé <ArrowIcon /></a>
+  </header>
 }
 
-function SectionTitle({ kicker, title, children }) { return <div className="section-title" data-reveal><span className="kicker">{kicker}</span><h2>{title}</h2>{children && <p>{children}</p>}</div> }
-function FlowMap({ steps }) { return <div className="flow-map" aria-label="System architecture">{steps.map((step, index) => <React.Fragment key={step}><span className="flow-step">{step}</span>{index < steps.length - 1 && <i aria-hidden="true" />}</React.Fragment>)}</div> }
-function MatrixField() { const streams = Array.from({ length: 24 }, (_, index) => '01アイウエオ<>[]{}*/'.slice(index % 6) + '0101100101010010010101'); return <div className="matrix-field" aria-hidden="true">{streams.map((stream, index) => <span key={index} style={{ '--column': index, '--speed': `${9 + (index % 6) * 2}s`, '--offset': `${-index * 1.7}s` }}>{stream}</span>)}</div> }
-function Header() { return <header className="site-header"><a className="brand" href="#top" aria-label="Atal Upadhyay home"><b /> atal<span>OS</span></a><nav aria-label="Main navigation"><a href="#work">Work</a><a href="#capabilities">Capabilities</a><a href="#journey">Journey</a><a href="#contact">Contact</a></nav><a className="header-cta" href={resumeUrl} target="_blank" rel="noreferrer">Resume <span aria-hidden="true">↗</span></a></header> }
-function Hero() { return <section id="top" className="hero shell"><div className="hero-copy" data-reveal><p className="availability"><span /> Available for engineering roles</p><p className="hero-chapter">Chapter 01 <i /> The engineer behind the system</p><h1>I turn complex systems into <em>reliable</em> products.</h1><p className="hero-lede">{profile.summary} Based in {profile.location}.</p><div className="hero-actions"><a className="button button-primary" href="#work">Explore selected work <span aria-hidden="true">↓</span></a><a className="text-link" href={`mailto:${profile.email}`}>Start a conversation <span aria-hidden="true">↗</span></a></div></div><div className="signal-field" data-reveal aria-label="A visual representation of connected engineering systems"><div className="depth-layer depth-grid" /><div className="depth-layer depth-halo" /><div className="signal-label"><span>LIVE SYSTEM MAP</span><strong>01 / 03</strong></div><div className="orb orb-one" /><div className="orb orb-two" /><div className="orb orb-three" /><div className="system-node core">Reliable<br />systems</div><div className="system-node node-ai">AI<br />workflows</div><div className="system-node node-cloud">Cloud<br />delivery</div><div className="system-node node-data">Data<br />pipelines</div><svg viewBox="0 0 600 480" aria-hidden="true"><path d="M302 235 L145 125 M302 235 L468 138 M302 235 L438 360" /><path className="dash" d="M302 235 L145 125 M302 235 L468 138 M302 235 L438 360" /></svg><p>Architecture, automation, and delivery—connected by deliberate engineering decisions.</p></div></section> }
-function Proof() { return <section id="proof" className="proof shell" aria-label="Selected outcomes">{impactStats.map((stat, index) => <article key={stat.label} data-reveal style={{ '--delay': `${index * 70}ms` }}><strong>{stat.number}</strong><span>{stat.label}</span><small>{stat.source}</small></article>)}</section> }
-function Work() { const [active, setActive] = useState(featuredProjects[0]); return <section id="work" className="work-section shell"><SectionTitle kicker="Selected work" title="Every system starts with a hard question.">These are not feature lists. They are stories of constraints, decisions, and the outcomes that followed.</SectionTitle><div className="case-tabs" role="tablist" aria-label="Selected projects">{featuredProjects.map((project, index) => <button key={project.id} role="tab" aria-selected={active.id === project.id} className={active.id === project.id ? 'active' : ''} onClick={() => setActive(project)}><small>0{index + 1}</small>{project.title}</button>)}</div><article className="case-study" data-reveal><div className="case-intro"><p className="kicker">{active.type}</p><p className="story-index">Case file / 0{featuredProjects.indexOf(active) + 1}</p><h3>{active.title}</h3><p className="case-impact">{active.impact}</p><dl><div><dt>My role</dt><dd>{active.role}</dd></div><div><dt>Scope</dt><dd>{active.status}</dd></div></dl></div><div className="case-story"><div><span>01 / The tension</span><p>{active.problem}</p></div><div><span>02 / The response</span><p>{active.solution}</p></div><div><span>03 / What mattered</span><p>{active.lesson}</p></div></div><div className="architecture"><span>The system I connected</span><FlowMap steps={active.architecture} /></div><div className="case-tags">{active.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></article><div className="more-work" data-reveal><p className="kicker">More systems shipped</p>{supportingProjects.map((project) => <article key={project.id}><span>{project.type}</span><h3>{project.title}</h3><p>{project.impact}</p></article>)}</div></section> }
-function Capabilities() { const descriptions = ['Grounded AI workflows with clear feedback loops.', 'APIs and services designed around reliable boundaries.', 'Data that arrives cleanly, on time, and ready to act on.', 'Delivery systems built for resilience and observability.', 'Repeatable releases, containers, and operational discipline.', 'Background work, events, and integrations that keep systems moving.']; return <section id="capabilities" className="capabilities shell"><SectionTitle kicker="How I work" title="A platform mindset from first request to production.">Tools support the work. The point is a system that is observable, maintainable, and useful.</SectionTitle><div className="capability-grid">{stackLayers.map((layer, index) => <article key={layer.title} data-reveal style={{ '--delay': `${index * 65}ms` }}><small>0{index + 1}</small><h3>{layer.title}</h3><p>{descriptions[index]}</p><div>{layer.tools.slice(0, 5).map((tool) => <span key={tool}>{tool}</span>)}</div></article>)}</div></section> }
-function Journey() { return <section id="journey" className="journey shell"><SectionTitle kicker="Career trajectory" title="Growing scope, one system at a time." /><div className="timeline">{timeline.map((item, index) => <article key={`${item.company}-${item.period}`} data-reveal style={{ '--delay': `${index * 55}ms` }}><span>{item.period}</span><div><h3>{item.role}</h3><strong>{item.company}</strong></div><p>{item.highlight}</p></article>)}</div></section> }
-function Contact() { return <section id="contact" className="contact shell" data-reveal><p className="kicker">Let’s build</p><h2>Looking for an engineer who enjoys the hard parts?</h2><p>I’m open to backend, AI platform, cloud, microservices, and automation-heavy engineering roles.</p><div><a className="button button-primary" href={`mailto:${profile.email}`}>Email me <span aria-hidden="true">↗</span></a><a className="text-link" href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <span aria-hidden="true">↗</span></a><a className="text-link" href={profile.github} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a></div></section> }
-function App() {
-  const [showExperience, setShowExperience] = useState(true)
-  useScrollReveal()
-  useMatrixInteraction()
-  if (showExperience) return <ExperienceShell onExit={() => setShowExperience(false)} />
-  return <main><MatrixField /><div className="page-noise" /><Header /><Hero /><Proof /><Work /><Capabilities /><Journey /><Contact /><footer className="shell"><span>© {new Date().getFullYear()} {profile.name}</span><span>AtalOS / Engineering systems, clearly told.</span></footer></main>
+function Hero() {
+  return <section id="top" className="hero">
+    <div className="hero-copy" data-reveal>
+      <p className="eyebrow"><span /> Field notes / 01</p>
+      <h1>Useful systems, made <em>alive.</em></h1>
+      <p className="hero-lede">{profile.summary} Based in {profile.location}.</p>
+      <div className="hero-actions">
+        <a className="button button-primary" href="#work">Explore the work <ArrowIcon /></a>
+        <a className="text-link" href={`mailto:${profile.email}`}>Start a conversation <ArrowIcon /></a>
+      </div>
+    </div>
+    <CanopyGraphic />
+    <div className="hero-footer" data-reveal>
+      <span>ENGINEERING PORTFOLIO / 2026</span>
+      <span>SCROLL TO FOLLOW THE WORK <ArrowIcon /></span>
+    </div>
+  </section>
 }
+
+function Outcomes() {
+  return <section className="outcomes section-shell" aria-label="Selected outcomes">
+    <div className="section-rule"><span>01.</span><p>What changes when the system works</p><small>OUTCOMES</small></div>
+    <div className="outcome-list">
+      {impactStats.slice(0, 3).map((stat, index) => <article key={stat.label} data-reveal>
+        <span>0{index + 1}</span><strong>{stat.number}</strong><div><b>{stat.label}</b><p>{stat.source}</p></div>
+      </article>)}
+    </div>
+  </section>
+}
+
+function Work() {
+  const [activeId, setActiveId] = useState(featuredProjects[0].id)
+  const active = featuredProjects.find((project) => project.id === activeId) ?? featuredProjects[0]
+  return <section id="work" className="work section-shell">
+    <div className="section-rule"><span>02.</span><p>Selected systems</p><small>WORK</small></div>
+    <div className="work-intro" data-reveal><h2>Complexity is only useful when it <em>clears</em> the path.</h2><p>Projects selected for the technical decisions behind them—not just the tools used to ship them.</p></div>
+    <div className="work-layout" data-reveal>
+      <div className="project-index" role="tablist" aria-label="Selected projects">
+        {featuredProjects.map((project, index) => <button key={project.id} type="button" role="tab" aria-selected={project.id === active.id} className={project.id === active.id ? 'is-active' : ''} onClick={() => setActiveId(project.id)}>
+          <span>0{index + 1}</span><b>{project.title}</b><i aria-hidden="true"><ArrowIcon /></i>
+        </button>)}
+      </div>
+      <article className="project-feature" role="tabpanel" aria-live="polite">
+        <div className="project-feature-top"><p className="eyebrow"><span /> {active.type}</p><span>{active.status}</span></div>
+        <h3>{active.title}</h3>
+        <p className="project-impact">{active.impact}</p>
+        <div className="project-story"><div><span>The tension</span><p>{active.problem}</p></div><div><span>The response</span><p>{active.solution}</p></div></div>
+        <div className="project-tags" aria-label="Technologies used">{active.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+      </article>
+    </div>
+  </section>
+}
+
+function Approach() {
+  return <section id="approach" className="approach section-shell">
+    <div className="section-rule"><span>03.</span><p>How the work takes shape</p><small>APPROACH</small></div>
+    <div className="approach-lede" data-reveal><h2>Every layer needs a clear <em>reason</em> to exist.</h2><p>I work from the boundary inward: understand the humans and systems involved, design reliable connections, and then make the result observable in production.</p></div>
+    <ol className="approach-list">
+      {stackLayers.map((layer, index) => <li key={layer.title} data-reveal><span>0{index + 1}</span><div><h3>{layer.title}</h3><p>{layer.tools.slice(0, 4).join(' · ')}</p></div><SparkIcon /></li>)}
+    </ol>
+  </section>
+}
+
+function Journey() {
+  return <section id="journey" className="journey section-shell">
+    <div className="section-rule"><span>04.</span><p>Growing scope through delivery</p><small>JOURNEY</small></div>
+    <div className="journey-grid"><h2 data-reveal>Built through the <em>hard parts.</em></h2><div className="timeline">
+      {timeline.map((item) => <article key={`${item.company}-${item.period}`} data-reveal><span>{item.period}</span><div><h3>{item.role}</h3><b>{item.company}</b><p>{item.highlight}</p></div></article>)}
+    </div></div>
+  </section>
+}
+
+function Contact() {
+  return <section id="contact" className="contact">
+    <div className="contact-copy" data-reveal><p className="eyebrow"><span /> Open to the next system</p><h2>Let’s make the difficult part <em>work.</em></h2><p>I’m open to software engineering roles involving backend systems, AI platforms, cloud infrastructure, and automation-heavy products.</p><a className="button button-light" href={`mailto:${profile.email}`}>Email me <ArrowIcon /></a></div>
+    <div className="contact-links" data-reveal><a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowIcon /></a><a href={profile.github} target="_blank" rel="noreferrer">GitHub <ArrowIcon /></a><a href={resumeUrl} target="_blank" rel="noreferrer">Résumé <ArrowIcon /></a></div>
+  </section>
+}
+
+function Portfolio() {
+  useReveal()
+  return <main>
+    <a className="skip-link" href="#work">Skip to selected work</a>
+    <Header />
+    <Hero />
+    <Outcomes />
+    <Work />
+    <Approach />
+    <Journey />
+    <Contact />
+    <footer className="site-footer"><span>© {new Date().getFullYear()} {profile.name}</span><span>AtalOS / Systems with a human edge.</span></footer>
+  </main>
+}
+
+function App() { return <Portfolio /> }
+
 createRoot(document.getElementById('root')).render(<App />)
