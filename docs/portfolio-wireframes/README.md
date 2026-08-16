@@ -37,6 +37,12 @@ site code is changed while the direction is being decided.
 - `13-ioc-live-route-implementation.md` - the IOC vessel route and motion
   implementation decision record.
 
+- `14-fora-work-navigator-direction.md` - proposed index-to-case presentation
+  direction for connecting selected work, project index, and system practice.
+
+- `15-work-navigator-implementation.md` - delivered Work Navigator
+  implementation, interaction model, and QA record.
+
 ## Decision status
 
 **Implemented.** The approved system-story direction now exists in the live

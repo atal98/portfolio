@@ -82,3 +82,26 @@ the final verification record.
 - Completed a clean production-preview QA cycle. Corrected a clipped diagram
   label and expanded the brand, skip, and compact navigation links to 44 px
   minimum hit targets.
+
+## 2026-08-16 - Fora work-navigator research documented
+
+- Reviewed Fora's homepage, Work index, and a representative case study to
+  isolate its index-to-case navigation relationship.
+- Documented a proposed Work Navigator that keeps the portfolio entry and
+  existing project features intact while connecting selected work, project
+  index, and system practice into one selected-case presentation.
+- Recorded the reference's accessibility and scroll-model issues as explicit
+  constraints for a future implementation.
+- No live React code was changed in this direction-setting pass.
+
+## 2026-08-16 - Work Navigator implemented and reviewed
+
+- Consolidated the previously separate selected-work, work-index, and
+  system-practice presentations into one index-to-case Work Navigator.
+- Preserved the entry hero, all project evidence, project-specific interface
+  scenes, system stories, and contact section.
+- Added project URL state and Back/Forward synchronization, in-place keyboard
+  selection, reduced-motion-safe transitions, and responsive sticky/stacked
+  layouts.
+- Completed build and browser QA. Normalized the hero scene frame after an
+  initial visual-continuity finding, then rechecked the final interaction.

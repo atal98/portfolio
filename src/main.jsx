@@ -19,6 +19,11 @@ const navigationIcon = (routeState) => L.divIcon({
   iconAnchor: [16, 16]
 })
 
+function projectFromUrl() {
+  const projectId = new URLSearchParams(window.location.search).get('project')
+  return projects.find((project) => project.id === projectId) ?? initialProject
+}
+
 const storyMeta = {
   'bpcl-ev': {
     mode: 'event-route',
@@ -359,9 +364,7 @@ function Header() {
       {menuOpen ? 'Close menu' : 'Open menu'}
     </button>
     <nav id="primary-navigation" className={menuOpen ? 'is-open' : ''} aria-label="Primary navigation">
-      <a href="#selected" onClick={closeMenu}>Selected work</a>
-      <a href="#index" onClick={closeMenu}>Index</a>
-      <a href="#practice" onClick={closeMenu}>Practice</a>
+      <a href="#work" onClick={closeMenu}>Work</a>
       <a href="#contact" onClick={closeMenu}>Contact</a>
     </nav>
     <a className="resume-link" href={resumeUrl} target="_blank" rel="noreferrer">Résumé <ArrowIcon /></a>
@@ -375,7 +378,7 @@ function Hero({ project }) {
       <h1 id="portfolio-title">Atal<br />Upadhyay</h1>
       <p className="hero-lede">I build reliable backend systems where AI, data, and cloud infrastructure meet.</p>
       <div className="hero-actions">
-        <a className="button button-primary" href="#selected">View selected work <ArrowIcon /></a>
+        <a className="button button-primary" href="#work">View selected work <ArrowIcon /></a>
         <a className="text-link" href={`mailto:${profile.email}`}>Start a conversation <ArrowIcon /></a>
       </div>
     </div>
@@ -390,33 +393,9 @@ function Hero({ project }) {
   </section>
 }
 
-function SelectedWork({ project }) {
-  return <section id="selected" className="selected section-shell" aria-labelledby="selected-heading">
-    <div className="section-label"><span>01</span><p>Selected work</p></div>
-    <div className="selected-layout">
-      <div className="selected-copy" data-reveal>
-        <p className="eyebrow">{project.role}</p>
-        <h2 id="selected-heading">{project.title}</h2>
-        <p className="section-lede">{project.problem}</p>
-        <p className="project-impact">{project.impact}</p>
-      </div>
-      <div className="selected-detail" data-reveal>
-        <div className="detail-row"><span>System decision</span><p>{project.solution}</p></div>
-        <div className="detail-row"><span>Technical focus</span><p>{project.tags.join(' · ')}</p></div>
-        <div className="detail-row"><span>Engineering lesson</span><p>{project.lesson}</p></div>
-      </div>
-    </div>
-  </section>
-}
-
-function ProjectIndex({ activeProject, onSelect }) {
+function WorkNavigator({ activeProject, onSelect }) {
   const changeProject = (project) => {
     onSelect(project)
-    const selectedSection = document.getElementById('selected')
-    if (!selectedSection) return
-    const top = selectedSection.getBoundingClientRect().top + window.scrollY - 76
-    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
-    window.scrollTo({ top, behavior })
   }
 
   const onProjectKeyDown = (event, currentIndex) => {
@@ -432,47 +411,66 @@ function ProjectIndex({ activeProject, onSelect }) {
     document.getElementById(`project-tab-${nextProject.id}`)?.focus()
   }
 
-  return <section id="index" className="project-index-section" aria-labelledby="index-heading">
-    <div className="section-shell">
-      <div className="index-heading" data-reveal>
-        <div className="section-label"><span>02</span><p>Work index</p></div>
-        <h2 id="index-heading">Projects, in a readable line.</h2>
-        <p className="section-lede">Choose a project to update the system story above. The index is the primary way to browse the work.</p>
-      </div>
-      <div className="project-list" role="tablist" aria-label="Project index" data-reveal>
-        {projects.map((project, index) => <button
-          id={`project-tab-${project.id}`}
-          key={project.id}
-          type="button"
-          role="tab"
-          aria-selected={project.id === activeProject.id}
-          aria-controls="selected-project-panel"
-          tabIndex={project.id === activeProject.id ? 0 : -1}
-          onClick={() => changeProject(project)}
-          onKeyDown={(event) => onProjectKeyDown(event, index)}
-        >
-          <span className="project-number">{String(index + 1).padStart(2, '0')}</span>
-          <strong>{project.title}</strong>
-          <span className="project-type">{project.type}</span>
-          <span className="project-role">{project.role}</span>
-          <ArrowIcon />
-        </button>)}
-      </div>
+  return <section id="work" className="work-navigator section-shell" aria-labelledby="work-heading">
+    <div className="work-navigator-intro" data-reveal>
+      <div className="section-label"><span>01</span><p>Work navigator</p></div>
+      <h2 id="work-heading">Selected work, in context.</h2>
+      <p className="section-lede">Choose a project to follow the operational problem, the engineering decision, and the system behind it.</p>
     </div>
-  </section>
-}
-
-function Practice({ project }) {
-  return <section id="practice" className="practice section-shell" aria-labelledby="practice-heading">
-    <div className="section-label"><span>03</span><p>System practice</p></div>
-    <div className="practice-layout">
-      <div data-reveal>
-        <h2 id="practice-heading">Make the system legible before making it larger.</h2>
-        <p className="section-lede">The work moves from the operational boundary to the internal flow, then back to an observable outcome.</p>
-      </div>
-      <div id="selected-project-panel" className="practice-panel" role="tabpanel" aria-labelledby={`project-tab-${project.id}`} aria-live="polite" data-reveal>
-        <p className="panel-project">{project.title}</p>
-        <SystemStory project={project} compact />
+    <div className="work-navigator-layout">
+      <aside className="work-index-rail" aria-label="Project index">
+        <div className="work-rail-context">
+          <p className="eyebrow">Projects / {String(projects.length).padStart(2, '0')}</p>
+          <p>Choose a case to update the full engineering story.</p>
+        </div>
+        <div className="work-project-list" role="tablist" aria-label="Project index">
+          {projects.map((project, index) => <button
+            id={`project-tab-${project.id}`}
+            key={project.id}
+            type="button"
+            role="tab"
+            aria-selected={project.id === activeProject.id}
+            aria-controls="selected-project-panel"
+            tabIndex={project.id === activeProject.id ? 0 : -1}
+            onClick={() => changeProject(project)}
+            onKeyDown={(event) => onProjectKeyDown(event, index)}
+          >
+            <span className="project-number">{String(index + 1).padStart(2, '0')}</span>
+            <span className="project-index-copy"><strong>{project.title}</strong><small>{project.type}</small></span>
+            <ArrowIcon />
+          </button>)}
+        </div>
+      </aside>
+      <div id="selected-project-panel" className="work-case-panel" role="tabpanel" aria-labelledby={`project-tab-${activeProject.id}`} aria-live="polite" tabIndex="-1">
+        <article className="case-stage" key={activeProject.id}>
+          <div className="case-heading">
+            <div>
+              <p className="case-number">Case {String(projects.indexOf(activeProject) + 1).padStart(2, '0')} / Selected</p>
+              <p className="eyebrow">{activeProject.role}</p>
+              <h3>{activeProject.title}</h3>
+            </div>
+            <p className="project-impact">{activeProject.impact}</p>
+          </div>
+          <div className="case-body">
+            <p className="case-problem">{activeProject.problem}</p>
+            <div className="selected-detail">
+              <div className="detail-row"><span>System decision</span><p>{activeProject.solution}</p></div>
+              <div className="detail-row"><span>Technical focus</span><p>{activeProject.tags.join(' · ')}</p></div>
+              <div className="detail-row"><span>Engineering lesson</span><p>{activeProject.lesson}</p></div>
+            </div>
+          </div>
+          <div className="case-system-practice">
+            <div>
+              <p className="eyebrow">System practice</p>
+              <h4>Make the system legible before making it larger.</h4>
+              <p>The work moves from the operational boundary to the internal flow, then back to an observable outcome.</p>
+            </div>
+            <div className="practice-panel">
+              <p className="panel-project">{activeProject.title}</p>
+              <SystemStory project={activeProject} compact />
+            </div>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -498,18 +496,30 @@ function Contact() {
 
 function Portfolio() {
   const reducedMotion = useReducedMotion()
-  const [activeProject, setActiveProject] = useState(initialProject)
+  const [activeProject, setActiveProject] = useState(projectFromUrl)
   useReveal(reducedMotion)
+
+  useEffect(() => {
+    const syncProjectWithHistory = () => setActiveProject(projectFromUrl())
+    window.addEventListener('popstate', syncProjectWithHistory)
+    return () => window.removeEventListener('popstate', syncProjectWithHistory)
+  }, [])
+
+  const selectProject = (project) => {
+    if (project.id === activeProject.id) return
+    setActiveProject(project)
+    const nextUrl = new URL(window.location.href)
+    nextUrl.searchParams.set('project', project.id)
+    window.history.pushState({ project: project.id }, '', `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`)
+  }
 
   return <Theme accentColor="blue" grayColor="gray" radius="medium" scaling="95%">
     <Intro reducedMotion={reducedMotion} />
-    <a className="skip-link" href="#selected">Skip to selected work</a>
+    <a className="skip-link" href="#work">Skip to work navigator</a>
     <Header />
     <main>
       <Hero project={activeProject} />
-      <SelectedWork project={activeProject} />
-      <ProjectIndex activeProject={activeProject} onSelect={setActiveProject} />
-      <Practice project={activeProject} />
+      <WorkNavigator activeProject={activeProject} onSelect={selectProject} />
       <Contact />
     </main>
     <footer className="site-footer"><span>© {new Date().getFullYear()} {profile.name}</span><span>Software engineer · systems, made clearer.</span></footer>
