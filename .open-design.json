@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "designSystem": {
+    "slug": "default",
+    "path": "design-systems/default"
+  },
+  "skill": {
+    "slug": "web-prototype",
+    "path": "design-templates/web-prototype",
+    "kind": "design-template",
+    "mode": "prototype"
+  },
+  "boundAt": "2026-08-15T00:00:00Z"
+}

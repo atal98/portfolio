@@ -1,0 +1,234 @@
+<!doctype html>
+<!--
+  Visual proof modules for Atal Upadhyay's portfolio.
+  Open Design binding: default / web-prototype.
+  Review artefact only; not production React code.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>System stories · Atal Upadhyay</title>
+  <style>
+    :root {
+      --bg: #FAFAFA;
+      --surface: #FFFFFF;
+      --fg: #111111;
+      --muted: #6B6B6B;
+      --border: #E5E5E5;
+      --accent: #2F6FEB;
+      --accent-soft: color-mix(in oklch, var(--accent) 10%, transparent);
+      --fg-soft: color-mix(in oklch, var(--fg) 5%, transparent);
+      --font-display: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+      --fs-h1: clamp(44px, 6vw, 76px);
+      --fs-h2: clamp(32px, 4vw, 50px);
+      --fs-h3: 20px;
+      --fs-lead: 19px;
+      --fs-body: 16px;
+      --fs-meta: 12px;
+      --gap-xs: 8px;
+      --gap-sm: 12px;
+      --gap-md: 20px;
+      --gap-lg: 32px;
+      --gap-xl: 56px;
+      --gap-2xl: 96px;
+      --container: 1160px;
+      --gutter: 24px;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: var(--fs-body); line-height: 1.55; }
+    a { color: inherit; text-decoration: none; }
+    p { text-wrap: pretty; }
+    h1, h2, h3 { text-wrap: balance; }
+    .container { max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+    .section { padding-block: clamp(56px, 9vw, var(--gap-2xl)); }
+    .section + .section { border-top: 1px solid var(--border); }
+    .stack { display: flex; flex-direction: column; }
+    .row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--gap-md); }
+    .grid-1-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--gap-xl); align-items: start; }
+    .h1, h1 { margin: 0; font-family: var(--font-display); font-size: var(--fs-h1); font-weight: 600; line-height: 1.02; letter-spacing: -.045em; }
+    .h2, h2 { margin: 0; font-family: var(--font-display); font-size: var(--fs-h2); font-weight: 600; line-height: 1.08; letter-spacing: -.035em; }
+    .h3, h3 { margin: 0; font-size: var(--fs-h3); font-weight: 600; line-height: 1.25; letter-spacing: -.015em; }
+    .lead { max-width: 58ch; margin: 0; color: var(--muted); font-size: var(--fs-lead); }
+    .eyebrow, .meta { font-family: var(--font-mono); font-size: var(--fs-meta); letter-spacing: .08em; text-transform: uppercase; }
+    .eyebrow { margin: 0 0 var(--gap-md); color: var(--accent); }
+    .meta { color: var(--muted); }
+    .topnav { position: sticky; z-index: 10; top: 0; border-bottom: 1px solid var(--border); background: color-mix(in oklch, var(--bg) 94%, transparent); backdrop-filter: blur(12px); }
+    .topnav-inner { display: flex; min-height: 64px; align-items: center; justify-content: space-between; gap: var(--gap-md); }
+    .logo { font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: -.025em; }
+    .topnav nav { display: flex; gap: var(--gap-lg); }
+    .topnav nav a { color: var(--muted); font-size: 14px; }
+    .topnav nav a:hover { color: var(--fg); }
+    .pagefoot { border-top: 1px solid var(--border); padding-block: var(--gap-xl); color: var(--muted); font-size: 13px; }
+    .pagefoot .row-between { flex-wrap: wrap; }
+    .btn { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 16px; background: transparent; color: var(--fg); font-size: 14px; font-weight: 500; }
+    .btn:hover { border-color: var(--fg); }
+    .btn-arrow::after { content: "→"; }
+
+    .hero { padding-block: clamp(84px, 12vw, 150px); }
+    .hero-copy { max-width: 760px; }
+    .hero h1 { margin-bottom: var(--gap-md); }
+    .hero-notes { display: flex; flex-wrap: wrap; gap: var(--gap-sm); margin-top: var(--gap-lg); }
+    .tag { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; color: var(--muted); font-size: 12px; }
+
+    .story-copy { position: sticky; top: 96px; }
+    .story-copy h2 { margin-bottom: var(--gap-md); }
+    .story-note { margin: var(--gap-lg) 0 0; border-top: 1px solid var(--fg); padding-top: var(--gap-md); color: var(--muted); font-size: 14px; }
+    .story-note strong { display: block; margin-bottom: 6px; color: var(--fg); font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+
+    .system-canvas { position: relative; min-height: 480px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: clamp(24px, 4vw, 44px); background: var(--surface); }
+    .system-canvas::before { position: absolute; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; content: ""; background: var(--fg-soft); opacity: .45; }
+    .canvas-label { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: var(--gap-md); color: var(--muted); font: 500 11px var(--font-mono); letter-spacing: .07em; text-transform: uppercase; }
+    .route { position: relative; z-index: 1; display: grid; gap: 0; margin: clamp(52px, 8vw, 86px) 0 0; padding: 0; list-style: none; }
+    .route li { position: relative; display: grid; grid-template-columns: 50px minmax(0, 1fr); align-items: center; min-height: 56px; gap: var(--gap-sm); }
+    .route li:not(:last-child)::after { position: absolute; bottom: -2px; left: 24px; width: 1px; height: 18px; content: ""; background: var(--border); }
+    .route-index { display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid var(--border); border-radius: 50%; color: var(--muted); font: 500 11px var(--font-mono); }
+    .route li:nth-child(4) .route-index { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+    .route-title { font-size: 15px; font-weight: 600; }
+    .route-detail { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+    .canvas-result { position: absolute; right: clamp(24px, 4vw, 44px); bottom: clamp(24px, 4vw, 44px); left: clamp(24px, 4vw, 44px); border-top: 1px solid var(--border); padding-top: var(--gap-md); color: var(--muted); font-size: 14px; }
+    .canvas-result strong { color: var(--fg); }
+
+    .pipeline { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap-md); margin-top: clamp(52px, 8vw, 80px); }
+    .pipeline-step { min-height: 110px; border-top: 1px solid var(--border); padding-top: var(--gap-sm); }
+    .pipeline-step span { color: var(--muted); font: 500 11px var(--font-mono); }
+    .pipeline-step h3 { margin-top: 16px; font-size: 16px; }
+    .pipeline-step p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .pipeline-step.is-decision { border-color: var(--accent); }
+    .pipeline-step.is-decision span { color: var(--accent); }
+
+    .boundary-map { position: relative; z-index: 1; display: grid; gap: var(--gap-md); margin-top: clamp(42px, 7vw, 70px); }
+    .boundary-lane { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: var(--gap-md); align-items: start; border-top: 1px solid var(--border); padding-top: var(--gap-md); }
+    .boundary-lane > span { color: var(--muted); font: 500 11px var(--font-mono); letter-spacing: .07em; text-transform: uppercase; }
+    .boundary-lane div { display: flex; flex-wrap: wrap; gap: var(--gap-xs); }
+    .boundary-lane b { border: 1px solid var(--border); padding: 7px 9px; font-size: 13px; font-weight: 500; }
+    .boundary-lane.is-decision b { border-color: var(--accent); background: var(--accent-soft); }
+
+    @media (max-width: 920px) {
+      .grid-1-2 { grid-template-columns: 1fr; }
+      .story-copy { position: static; }
+    }
+    @media (max-width: 640px) {
+      :root { --gutter: 16px; }
+      .topnav nav { gap: var(--gap-md); }
+      .topnav nav a:last-child { display: none; }
+      .system-canvas { min-height: 0; }
+      .pipeline { grid-template-columns: 1fr 1fr; }
+      .boundary-lane { grid-template-columns: 1fr; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topnav" data-od-id="topnav">
+    <div class="container topnav-inner">
+      <a class="logo" href="#overview">ATAL / UPADHYAY</a>
+      <nav aria-label="Wireframe sections">
+        <a href="#ev">EV route</a>
+        <a href="#planning">AI pipeline</a>
+        <a href="#tenant">Tenant boundary</a>
+      </nav>
+      <a class="btn btn-arrow" href="08-system-story-pattern.md">Read pattern</a>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="section hero" id="overview" data-od-id="hero">
+      <div class="container hero-copy">
+        <p class="eyebrow">Wireframe / visual proof modules</p>
+        <h1>Show the engineering story as a system.</h1>
+        <p class="lead">A case study should make the route, boundary, or pipeline visible before it names the technical stack.</p>
+        <div class="hero-notes" aria-label="Wireframe principles">
+          <span class="tag">Project-specific diagrams</span>
+          <span class="tag">Named product stages</span>
+          <span class="tag">One decision in focus</span>
+          <span class="tag">Verified outcome</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="ev" data-od-id="bpcl-event-route">
+      <div class="container grid-1-2">
+        <div class="story-copy">
+          <p class="eyebrow">BPCL-EV Charging Platform</p>
+          <h2>Event route</h2>
+          <p class="lead">The visual follows a charging request across protocol, orchestration, state, and partner-network boundaries.</p>
+          <p class="story-note"><strong>Decision in focus</strong>Temporal workflows coordinate asynchronous orders and session lifecycle updates; Redis shortens the critical read path.</p>
+        </div>
+        <div class="system-canvas" aria-label="BPCL EV charging event route visual wireframe">
+          <div class="canvas-label"><span>Protocol + microservices</span><span>System route</span></div>
+          <ol class="route">
+            <li><span class="route-index">01</span><div><div class="route-title">User discovery</div><p class="route-detail">Find a charger, compare tariffs, begin an order.</p></div></li>
+            <li><span class="route-index">02</span><div><div class="route-title">Beckn protocol layer</div><p class="route-detail">Exchange discovery and order intent across the network.</p></div></li>
+            <li><span class="route-index">03</span><div><div class="route-title">FastAPI services</div><p class="route-detail">Validate requests and expose reliable service boundaries.</p></div></li>
+            <li><span class="route-index">04</span><div><div class="route-title">Temporal + Redis</div><p class="route-detail">Orchestrate stateful work and cache high-frequency reads.</p></div></li>
+            <li><span class="route-index">05</span><div><div class="route-title">OCPI CPO layer</div><p class="route-detail">Synchronize data and session updates with charge-point operators.</p></div></li>
+            <li><span class="route-index">06</span><div><div class="route-title">EV charging network</div><p class="route-detail">Deliver an operational session to the user.</p></div></li>
+          </ol>
+          <p class="canvas-result"><strong>Observed outcome:</strong> session initiation latency reduced through asynchronous workflows and caching.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="planning" data-od-id="planzookie-context-pipeline">
+      <div class="container grid-1-2">
+        <div class="story-copy">
+          <p class="eyebrow">Planzookie AI Planning Platform</p>
+          <h2>Grounded context pipeline</h2>
+          <p class="lead">The visual makes the data grounding visible, so the project reads as structured planning support—not generic text generation.</p>
+          <p class="story-note"><strong>Decision in focus</strong>Domain datasets are assembled into context before the LLM workflow creates a structured report section.</p>
+        </div>
+        <div class="system-canvas" aria-label="Planzookie grounded context pipeline visual wireframe">
+          <div class="canvas-label"><span>AI + real-world data</span><span>Context pipeline</span></div>
+          <div class="pipeline">
+            <div class="pipeline-step"><span>01</span><h3>Planning input</h3><p>Local prompt, project need, or planning question.</p></div>
+            <div class="pipeline-step"><span>02</span><h3>Source datasets</h3><p>Census, transportation, and parcel information.</p></div>
+            <div class="pipeline-step is-decision"><span>03</span><h3>Context assembly</h3><p>Relevant signals become constrained input for the workflow.</p></div>
+            <div class="pipeline-step"><span>04</span><h3>LLM workflow</h3><p>Generate a section in a predefined planning structure.</p></div>
+            <div class="pipeline-step"><span>05</span><h3>Maps + visuals</h3><p>Add spatial or comparative evidence where useful.</p></div>
+            <div class="pipeline-step"><span>06</span><h3>Planning report</h3><p>Deliver readable, structured material for further review.</p></div>
+          </div>
+          <p class="canvas-result"><strong>Operational result:</strong> the workflow connects real-world context to report structure before content reaches the reader.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tenant" data-od-id="spotwork-tenant-boundary">
+      <div class="container grid-1-2">
+        <div class="story-copy">
+          <p class="eyebrow">Spotwork Multi-Tenant SaaS Job Board</p>
+          <h2>Tenant trust boundary</h2>
+          <p class="lead">The visual puts isolation and permissions at the centre, showing that multi-tenancy is a system-wide trust decision.</p>
+          <p class="story-note"><strong>Decision in focus</strong>Tenant resolution and isolated databases sit between the public portal and the deployed microservices.</p>
+        </div>
+        <div class="system-canvas" aria-label="Spotwork tenant trust boundary visual wireframe">
+          <div class="canvas-label"><span>SaaS infrastructure</span><span>Trust boundary map</span></div>
+          <div class="boundary-map">
+            <div class="boundary-lane"><span>Entry</span><div><b>Tenant portal</b><b>Auth + RBAC</b></div></div>
+            <div class="boundary-lane is-decision"><span>Boundary</span><div><b>API gateway</b><b>Tenant resolver</b><b>Isolated database</b></div></div>
+            <div class="boundary-lane"><span>Runtime</span><div><b>Dockerized services</b><b>AWS ECS</b><b>CI/CD</b></div></div>
+            <div class="boundary-lane"><span>Assurance</span><div><b>Role-based access</b><b>Deployment discipline</b><b>Operational visibility</b></div></div>
+          </div>
+          <p class="canvas-result"><strong>System lesson:</strong> tenant isolation is expressed through identity, routing, data, and deployment boundaries together.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" data-od-id="adoption-note" style="text-align: center;">
+      <div class="container" style="max-width: 660px;">
+        <p class="eyebrow">Adoption rule</p>
+        <h2>One visual proof module per case study.</h2>
+        <p class="lead" style="margin: 18px auto 0;">Use it to explain the engineering decision that a recruiter, client, or collaborator would otherwise have to infer from a stack list.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pagefoot" data-od-id="footer">
+    <div class="container row-between"><span>Atal Upadhyay · system-story wireframe</span><span class="meta">Review artefact · not production UI</span></div>
+  </footer>
+</body>
+</html>
