@@ -1,15 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap');
 
 :root {
-  --bg: #f7f7f4;
-  --surface: #ffffff;
-  --ink: #151515;
-  --muted: #626262;
-  --line: #d9d9d4;
-  --accent: #2f6feb;
-  --accent-soft: #eaf0ff;
-  --route-forward: #197a45;
-  --route-hold: #b95718;
+  /* Cosmic Artistry: cool structural neutrals with a deep-ocean action color. */
+  --bg: #d3d9d4;
+  --surface: #f4f6f4;
+  --ink: #212a31;
+  --muted: #4a5a61;
+  --line: #b7c1c0;
+  --accent: #124e66;
+  --accent-soft: #dbe8e7;
+  --route-forward: #295954;
+  --route-hold: #87442d;
   --display: Archivo, Arial, sans-serif;
   --body: "Space Grotesk", Arial, sans-serif;
   --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
@@ -23,6 +24,7 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { min-width: 320px; margin: 0; background: var(--bg); }
+.radix-themes { min-height: 100vh; background: var(--bg); color: var(--ink); }
 body:has(.intro) { overflow: hidden; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; }
