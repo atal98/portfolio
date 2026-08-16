@@ -8,7 +8,8 @@ import 'leaflet/dist/leaflet.css'
 import './styles.css'
 import { profile, projects } from './data/portfolio'
 
-const resumeUrl = `${import.meta.env.BASE_URL}atal-upadhyay-resume.pdf`
+const resumeUrl = `${import.meta.env.BASE_URL}Atal-Upadhyay-Backend-Engineer-Resume.docx`
+const resumeFilename = 'Atal-Upadhyay-Backend-Engineer-Resume.docx'
 const initialProject = projects[0]
 const iocRoute = [[25.0657, 55.1713], [23.7, 60.2], [21.6, 65.8], [19.35, 70.3], [18.9388, 72.8354]]
 const iocRouteBounds = [[18.2, 54.2], [25.8, 73.8]]
@@ -370,7 +371,7 @@ function Header() {
       <a href="#work" onClick={closeMenu}>Work</a>
       <a href="#contact" onClick={closeMenu}>Contact</a>
     </nav>
-    <a className="resume-link" href={resumeUrl} target="_blank" rel="noreferrer">Résumé <ArrowIcon /></a>
+    <a className="resume-link" href={resumeUrl} download={resumeFilename}>Résumé <ArrowIcon /></a>
   </header>
 }
 
@@ -491,7 +492,7 @@ function Contact() {
         <a className="button button-primary" href={`mailto:${profile.email}`}>Email Atal <ArrowIcon /></a>
         <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowIcon /></a>
         <a href={profile.github} target="_blank" rel="noreferrer">GitHub <ArrowIcon /></a>
-        <a href={resumeUrl} target="_blank" rel="noreferrer">Read résumé <ArrowIcon /></a>
+        <a href={resumeUrl} download={resumeFilename}>Download résumé <ArrowIcon /></a>
       </div>
     </div>
   </section>
