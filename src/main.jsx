@@ -358,8 +358,11 @@ function Header() {
 
   const closeMenu = () => setMenuOpen(false)
 
-  return <header className="site-header">
-    <a className="brand" href="#top" onClick={closeMenu} aria-label="Atal Upadhyay, back to top">ATAL / UPADHYAY</a>
+  return <header className={`site-header${menuOpen ? ' is-menu-open' : ''}`}>
+    <a className="brand" href="#top" onClick={closeMenu} aria-label="Atal Upadhyay, back to top">
+      <span className="brand-full">ATAL / UPADHYAY</span>
+      <span className="brand-compact" aria-hidden="true">AU</span>
+    </a>
     <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="primary-navigation" onClick={() => setMenuOpen((open) => !open)}>
       {menuOpen ? 'Close menu' : 'Open menu'}
     </button>
